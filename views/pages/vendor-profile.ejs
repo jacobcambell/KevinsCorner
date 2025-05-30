@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Profile - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+    <%- include('../partials/vendor-nav') %>
+
+    <main>
+        <div class="form-container">
+            <h2>Vendor Profile Settings</h2>
+
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+
+            <div class="vendor-status">
+                <div class="status-indicator">
+                    <% if (vendor.vacation_mode === 1) { %>
+                        <span class="status-badge vacation">Vacation Mode</span>
+                        <p class="status-text">Your store is currently inactive - customers cannot see or purchase your products</p>
+                    <% } else { %>
+                        <span class="status-badge active">Active</span>
+                        <p class="status-text">Your store is live and visible to customers</p>
+                    <% } %>
+                </div>
+
+                <% if (user && user.lastLogin) { %>
+                    <div class="last-login-info">
+                        <p class="help-text">Last login: <%= new Date(user.lastLogin).toLocaleDateString() %></p>
+                        <p class="help-text">Note: Vendors are automatically set to vacation mode if inactive for 2 weeks</p>
+                    </div>
+                <% } %>
+            </div>
+
+            <form action="/vendor/profile/update" method="POST" class="vendor-profile-form">
+                <div class="form-group">
+                    <label for="avatarUpload">Vendor Avatar:</label>
+                    <div class="avatar-upload-section">
+                        <div class="current-avatar">
+                            <% if (vendor.avatar) { %>
+                                <img src="<%= vendor.avatar %>" alt="Current Avatar" class="avatar-preview" id="currentAvatar">
+                            <% } else { %>
+                                <div class="avatar-placeholder" id="currentAvatar">
+                                    <span>📷</span>
+                                </div>
+                            <% } %>
+                        </div>
+                        <input 
+                            type="file" 
+                            id="avatarUpload" 
+                            name="avatarUpload" 
+                            accept="image/*"
+                            onchange="handleAvatarUpload(this)"
+                        >
+                        <input type="hidden" id="avatarBase64" name="avatarBase64" value="">
+                        <p class="help-text">Upload a square image for best results. Will be displayed as a circle.</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="businessName">Business Name:</label>
+                    <input 
+                        type="text" 
+                        id="businessName" 
+                        name="businessName" 
+                        value="<%= vendor.business_name || '' %>"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="businessDescription">Business Description:</label>
+                    <textarea 
+                        id="businessDescription" 
+                        name="businessDescription" 
+                        rows="4"
+                        required
+                    ><%= vendor.business_description || '' %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="countryFlag">Country Flag:</label>
+                    <select 
+                        id="countryFlag" 
+                        name="countryFlag"
+                        class="form-select"
+                    >
+                        <option value="">Select your country...</option>
+                        <option value="🇺🇸" <%= vendor.country_flag === '🇺🇸' ? 'selected' : '' %>>🇺🇸 United States</option>
+                        <option value="🇨🇦" <%= vendor.country_flag === '🇨🇦' ? 'selected' : '' %>>🇨🇦 Canada</option>
+                        <option value="🇬🇧" <%= vendor.country_flag === '🇬🇧' ? 'selected' : '' %>>🇬🇧 United Kingdom</option>
+                        <option value="🇦🇺" <%= vendor.country_flag === '🇦🇺' ? 'selected' : '' %>>🇦🇺 Australia</option>
+                        <option value="🇩🇪" <%= vendor.country_flag === '🇩🇪' ? 'selected' : '' %>>🇩🇪 Germany</option>
+                        <option value="🇫🇷" <%= vendor.country_flag === '🇫🇷' ? 'selected' : '' %>>🇫🇷 France</option>
+                        <option value="🇮🇹" <%= vendor.country_flag === '🇮🇹' ? 'selected' : '' %>>🇮🇹 Italy</option>
+                        <option value="🇪🇸" <%= vendor.country_flag === '🇪🇸' ? 'selected' : '' %>>🇪🇸 Spain</option>
+                        <option value="🇳🇱" <%= vendor.country_flag === '🇳🇱' ? 'selected' : '' %>>🇳🇱 Netherlands</option>
+                        <option value="🇸🇪" <%= vendor.country_flag === '🇸🇪' ? 'selected' : '' %>>🇸🇪 Sweden</option>
+                        <option value="🇳🇴" <%= vendor.country_flag === '🇳🇴' ? 'selected' : '' %>>🇳🇴 Norway</option>
+                        <option value="🇩🇰" <%= vendor.country_flag === '🇩🇰' ? 'selected' : '' %>>🇩🇰 Denmark</option>
+                        <option value="🇯🇵" <%= vendor.country_flag === '🇯🇵' ? 'selected' : '' %>>🇯🇵 Japan</option>
+                        <option value="🇰🇷" <%= vendor.country_flag === '🇰🇷' ? 'selected' : '' %>>🇰🇷 South Korea</option>
+                        <option value="🇨🇳" <%= vendor.country_flag === '🇨🇳' ? 'selected' : '' %>>🇨🇳 China</option>
+                        <option value="🇮🇳" <%= vendor.country_flag === '🇮🇳' ? 'selected' : '' %>>🇮🇳 India</option>
+                        <option value="🇧🇷" <%= vendor.country_flag === '🇧🇷' ? 'selected' : '' %>>🇧🇷 Brazil</option>
+                        <option value="🇲🇽" <%= vendor.country_flag === '🇲🇽' ? 'selected' : '' %>>🇲🇽 Mexico</option>
+                        <option value="🇦🇷" <%= vendor.country_flag === '🇦🇷' ? 'selected' : '' %>>🇦🇷 Argentina</option>
+                        <option value="🇿🇦" <%= vendor.country_flag === '🇿🇦' ? 'selected' : '' %>>🇿🇦 South Africa</option>
+                        <option value="🇷🇺" <%= vendor.country_flag === '🇷🇺' ? 'selected' : '' %>>🇷🇺 Russia</option>
+                        <option value="🇵🇱" <%= vendor.country_flag === '🇵🇱' ? 'selected' : '' %>>🇵🇱 Poland</option>
+                        <option value="🇨🇿" <%= vendor.country_flag === '🇨🇿' ? 'selected' : '' %>>🇨🇿 Czech Republic</option>
+                        <option value="🇭🇺" <%= vendor.country_flag === '🇭🇺' ? 'selected' : '' %>>🇭🇺 Hungary</option>
+                        <option value="🇦🇹" <%= vendor.country_flag === '🇦🇹' ? 'selected' : '' %>>🇦🇹 Austria</option>
+                        <option value="🇨🇭" <%= vendor.country_flag === '🇨🇭' ? 'selected' : '' %>>🇨🇭 Switzerland</option>
+                        <option value="🇧🇪" <%= vendor.country_flag === '🇧🇪' ? 'selected' : '' %>>🇧🇪 Belgium</option>
+                        <option value="🇱🇺" <%= vendor.country_flag === '🇱🇺' ? 'selected' : '' %>>🇱🇺 Luxembourg</option>
+                        <option value="🇮🇪" <%= vendor.country_flag === '🇮🇪' ? 'selected' : '' %>>🇮🇪 Ireland</option>
+                        <option value="🇫🇮" <%= vendor.country_flag === '🇫🇮' ? 'selected' : '' %>>🇫🇮 Finland</option>
+                        <option value="🇪🇪" <%= vendor.country_flag === '🇪🇪' ? 'selected' : '' %>>🇪🇪 Estonia</option>
+                        <option value="🇱🇻" <%= vendor.country_flag === '🇱🇻' ? 'selected' : '' %>>🇱🇻 Latvia</option>
+                        <option value="🇱🇹" <%= vendor.country_flag === '🇱🇹' ? 'selected' : '' %>>🇱🇹 Lithuania</option>
+                        <option value="🇸🇬" <%= vendor.country_flag === '🇸🇬' ? 'selected' : '' %>>🇸🇬 Singapore</option>
+                        <option value="🇹🇭" <%= vendor.country_flag === '🇹🇭' ? 'selected' : '' %>>🇹🇭 Thailand</option>
+                        <option value="🇮🇩" <%= vendor.country_flag === '🇮🇩' ? 'selected' : '' %>>🇮🇩 Indonesia</option>
+                        <option value="🇵🇭" <%= vendor.country_flag === '🇵🇭' ? 'selected' : '' %>>🇵🇭 Philippines</option>
+                        <option value="🇲🇾" <%= vendor.country_flag === '🇲🇾' ? 'selected' : '' %>>🇲🇾 Malaysia</option>
+                        <option value="🇻🇳" <%= vendor.country_flag === '🇻🇳' ? 'selected' : '' %>>🇻🇳 Vietnam</option>
+                        <option value="🇳🇿" <%= vendor.country_flag === '🇳🇿' ? 'selected' : '' %>>🇳🇿 New Zealand</option>
+                    </select>
+                    <p class="help-text">Your country flag will be displayed on product listings to help customers identify your location</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="shippingFrom">Shipping From (Location):</label>
+                    <input 
+                        type="text" 
+                        id="shippingFrom" 
+                        name="shippingFrom" 
+                        value="<%= vendor.shipping_from || '' %>"
+                        placeholder="e.g., New York, USA"
+                    >
+                    <p class="help-text">Where you ship your products from</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="shippingTo">Shipping Destinations:</label>
+                    <textarea 
+                        id="shippingTo" 
+                        name="shippingTo" 
+                        rows="3"
+                        placeholder="e.g., United States, Canada, United Kingdom, Australia"
+                    ><%= vendor.shipping_to || '' %></textarea>
+                    <p class="help-text">List the countries or regions you ship to (comma-separated)</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-container">
+                        <input 
+                            type="checkbox" 
+                            name="vacationMode" 
+                            value="1"
+                            <%= vendor.vacation_mode === 1 ? 'checked' : '' %>
+                            id="vacationModeToggle"
+                        >
+                        <span class="toggle-slider"></span>
+                        Vacation Mode
+                    </label>
+                    <p class="help-text">Enable this when you're temporarily unable to fulfill orders. Your products will be completely hidden from public listings and customers won't be able to find or purchase them. You can re-enable your store at any time.</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+            </form>
+
+            <div class="links">
+                <a href="/vendor/products">← Back to Products</a>
+                <a href="/vendor/dashboard">Vendor Dashboard</a>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        function handleAvatarUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                input.value = '';
+                return;
+            }
+
+            // Validate file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image must be smaller than 5MB');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                
+                // Update preview
+                const currentAvatar = document.getElementById('currentAvatar');
+                if (currentAvatar.tagName === 'IMG') {
+                    currentAvatar.src = base64;
+                } else {
+                    // Replace placeholder with image
+                    const img = document.createElement('img');
+                    img.src = base64;
+                    img.alt = 'Avatar Preview';
+                    img.className = 'avatar-preview';
+                    img.id = 'currentAvatar';
+                    currentAvatar.parentNode.replaceChild(img, currentAvatar);
+                }
+
+                // Set hidden field value
+                document.getElementById('avatarBase64').value = base64;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Update vacation mode status display when toggled
+        document.getElementById('vacationModeToggle').addEventListener('change', function() {
+            const statusIndicator = document.querySelector('.status-indicator');
+            const statusBadge = document.querySelector('.status-badge');
+            const statusText = document.querySelector('.status-text');
+            
+            if (this.checked) {
+                statusBadge.className = 'status-badge vacation';
+                statusBadge.textContent = 'Vacation Mode';
+                statusText.textContent = 'Your store will be inactive - customers cannot see or purchase your products (changes saved when you submit)';
+            } else {
+                statusBadge.className = 'status-badge active';
+                statusBadge.textContent = 'Active';
+                statusText.textContent = 'Your store will be live and visible to customers (changes saved when you submit)';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= category.name %> - Forums - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <% 
+    // Helper function for time formatting
+    function formatServerTime(timestamp) {
+        if (!timestamp) return 'Unknown';
+        const date = new Date(timestamp);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'UTC'
+        }) + ' UTC';
+    }
+    %></head>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #d7dadc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .forum-category-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .category-header {
+            background: #1a1a1b;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .category-header h1 {
+            color: #d7dadc;
+            font-size: 24px;
+            font-weight: 500;
+            margin: 0 0 10px 0;
+        }
+        
+        .category-header p {
+            color: #818384;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .category-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .breadcrumb {
+            color: #818384;
+            font-size: 12px;
+        }
+        
+        .breadcrumb a {
+            color: #4fbcff;
+            text-decoration: none;
+            font-weight: 400;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .new-thread-btn {
+            background: #ff4500;
+            color: #fff;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: background 0.3s ease;
+        }
+        
+        .new-thread-btn:hover {
+            background: #ff5722;
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        .threads-list {
+            background: #1a1a1b;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .thread-item {
+            border-bottom: 1px solid #343536;
+            padding: 16px 20px;
+            transition: background 0.3s ease;
+        }
+        
+        .thread-item:last-child {
+            border-bottom: none;
+        }
+        
+        .thread-item:hover {
+            background: #272729;
+        }
+        
+        .thread-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .thread-info {
+            flex: 1;
+        }
+        
+        .thread-title {
+            margin: 0 0 8px 0;
+        }
+        
+        .thread-title a {
+            color: #d7dadc;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 20px;
+        }
+        
+        .thread-title a:hover {
+            color: #4fbcff;
+        }
+        
+        .pinned-badge {
+            background: #46d160;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+        
+        .locked-badge {
+            background: #ff4500;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+        
+        .thread-meta {
+            color: #818384;
+            font-size: 12px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0;
+        }
+        
+        .thread-stats {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            font-size: 12px;
+        }
+        
+        .stat-badge {
+            background: #272729;
+            color: #818384;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .no-threads {
+            text-align: center;
+            padding: 60px 40px;
+            color: #818384;
+            background: #1a1a1b;
+        }
+        
+        .no-threads h3 {
+            color: #d7dadc;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0 0 10px 0;
+        }
+        
+        .no-threads p {
+            color: #818384;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .forums-layout {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .forums-content {
+            flex: 1;
+            max-width: 740px;
+        }
+        
+        .banner-sidebar {
+            width: 320px;
+            flex-shrink: 0;
+        }
+        
+        .banner-container {
+            background: #1a1a1b;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            padding: 16px;
+        }
+        
+        .banner-title {
+            color: #d7dadc;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 12px 0;
+            text-align: center;
+        }
+        
+        .forum-banner {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .forum-banner-placeholder {
+            width: 100%;
+            height: 60px;
+            background: #272729;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #818384;
+            margin-bottom: 8px;
+        }
+        
+        .no-banners {
+            text-align: center;
+            color: #818384;
+            font-size: 12px;
+            font-style: italic;
+        }
+        
+        .links a {
+            color: #4fbcff;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .forums-layout {
+                flex-direction: column;
+                padding: 12px;
+            }
+            
+            .banner-sidebar {
+                width: 100%;
+                order: -1;
+            }
+            
+            .category-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .thread-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+        .forum-category-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .category-header {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .category-header h1 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .category-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .new-thread-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .new-thread-btn:hover {
+            background: #218838;
+            color: white;
+            text-decoration: none;
+        }
+
+        .threads-list {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .thread-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 15px 20px;
+            transition: background 0.3s ease;
+        }
+
+        .thread-item:last-child {
+            border-bottom: none;
+        }
+
+        .thread-item:hover {
+            background: #f8f9fa;
+        }
+
+        .thread-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .thread-info {
+            flex: 1;
+        }
+
+        .thread-title {
+            margin: 0 0 5px 0;
+        }
+
+        .thread-title a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .thread-title a:hover {
+            color: #007bff;
+        }
+
+        .thread-meta {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .thread-stats {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .stat-badge {
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #666;
+        }
+
+        .pinned-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .locked-badge {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .no-threads {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .forums-layout {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .forums-content {
+            flex: 2;
+            margin-right: 20px; /* Space between content and sidebar */
+        }
+
+        .forums-sidebar {
+            flex: 1;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .forums-sidebar h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        /* Banner Styles */
+        .banner-sidebar {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .banner-container {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .banner-title {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .forum-banner {
+            width: 100%;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .forum-banner-placeholder {
+            width: 100%;
+            height: 100px;
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .no-banners {
+            text-align: center;
+            color: #666;
+            padding: 10px;
+        }
+
+        .banner-link {
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <main>
+        <div class="forums-layout">
+            <div class="forums-content">
+                <div class="forum-category-container">
+                    <div class="category-header">
+                        <h1><%= category.name %></h1>
+                        <% if (category.description) { %>
+                            <p><%= category.description %></p>
+                        <% } %>
+                    </div>
+
+                    <% if (error) { %>
+                        <div class="error"><%= error %></div>
+                    <% } %>
+                    <% if (success) { %>
+                        <div class="success"><%= success %></div>
+                    <% } %>
+
+                    <div class="category-actions">
+                        <div class="breadcrumb">
+                            <a href="/forums">Forums</a> > <%= category.name %>
+                        </div>
+
+                        <% if (user && user.username === 'admin') { %>
+                            <a href="/forums/category/<%= category.id %>/new-thread" class="new-thread-btn">
+                                New Thread
+                            </a>
+                        <% } %>
+                    </div>
+
+                    <% if (threads && threads.length > 0) { %>
+                        <div class="threads-list">
+                            <% threads.forEach(thread => { %>
+                                <div class="thread-item">
+                                    <div class="thread-header">
+                                        <div class="thread-info">
+                                            <h3 class="thread-title">
+                                                <a href="/forums/thread/<%= thread.id %>"><%= thread.title %></a>
+                                                <% if (thread.is_pinned === 1) { %>
+                                                    <span class="pinned-badge">📌 Pinned</span>
+                                                <% } %>
+                                                <% if (thread.is_locked === 1) { %>
+                                                    <span class="locked-badge">🔒 Locked</span>
+                                                <% } %>
+                                            </h3>
+                                            <div class="thread-meta">
+                                                Started by <%= thread.created_by_displayname %> • 
+                                                <%= formatServerTime(thread.created_at) %>
+                                                <% if (thread.last_reply_at) { %>
+                                                    • Last reply: <%= formatServerTime(thread.last_reply_at) %>
+                                                <% } %>
+                                            </div>
+                                        </div>
+
+                                        <div class="thread-stats">
+                                            <div class="stat-badge">
+                                                <%= thread.reply_count || 0 %> replies
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <div class="threads-list">
+                            <div class="no-threads">
+                                <h3>No threads in this category yet</h3>
+                                <% if (user && user.username === 'admin') { %>
+                                    <p>Be the first to start a discussion!</p>
+                                <% } else { %>
+                                    <p>Check back later for new discussions!</p>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <div class="links">
+                        <a href="/forums">← Back to Forums</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="banner-sidebar">
+                <div class="banner-container">
+                    <h3 class="banner-title">🌟 90s BANNERS! 🌟</h3>
+                    <% if (banners && banners.length > 0) { %>
+                        <% banners.forEach(banner => { %>
+                            <% 
+                            let imageSrc = '';
+                            if (banner.image_data) {
+                                if (banner.image_data.startsWith('data:')) {
+                                    imageSrc = banner.image_data;
+                                } else {
+                                    imageSrc = `data:image/jpeg;base64,${banner.image_data}`;
+                                }
+                            }
+                            %>
+                            
+                            <% if (banner.link_url) { %>
+                                <a href="<%= banner.link_url %>" class="banner-link" target="_blank">
+                            <% } %>
+                            
+                            <% if (imageSrc) { %>
+                                <img src="<%= imageSrc %>" alt="<%= banner.title %>" class="forum-banner" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="forum-banner-placeholder" style="display: none;">
+                                    <%= banner.title %>
+                                </div>
+                            <% } else { %>
+                                <div class="forum-banner-placeholder" style="display: flex;">
+                                    <%= banner.title %>
+                                </div>
+                            <% } %>
+                            
+                            <% if (banner.link_url) { %>
+                                </a>
+                            <% } %>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="no-banners">No banners yet!</div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

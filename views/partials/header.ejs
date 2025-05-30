@@ -1,7 +1,157 @@
 <header>
-    <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-        </ul>
-    </nav>
+    <div class="header-container">
+        <div class="header-brand">
+            <h1><a href="/">Kevin's Corner</a></h1>
+        </div>
+
+        <nav class="main-nav">
+            <ul class="nav-list">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/forums" class="nav-link">Forums</a></li>
+                <li><a href="/rules" class="nav-link">Rules</a></li>
+
+                <% if (typeof user !== 'undefined' && user && user.id) { %>
+                    <!-- Logged in user navigation -->
+                    <li class="nav-item-with-badge">
+                        <a href="/messages" class="nav-link">Messages</a>
+                        <% if (typeof unreadMessageCount !== 'undefined' && unreadMessageCount > 0) { %>
+                            <span class="nav-badge"><%= unreadMessageCount %></span>
+                        <% } %>
+                    </li>
+                    <li class="nav-item-with-badge">
+                        <% if (user.isVendor) { %>
+                            <a href="/vendor/orders" class="nav-link">Orders</a>
+                            <% if (typeof pendingVendorOrders !== 'undefined' && pendingVendorOrders > 0) { %>
+                                <span class="nav-badge vendor-orders"><%= pendingVendorOrders %></span>
+                            <% } %>
+                        <% } else { %>
+                            <a href="/orders" class="nav-link">Orders</a>
+                            <% if (typeof orderUpdates !== 'undefined' && orderUpdates > 0) { %>
+                                <span class="nav-badge order-updates"><%= orderUpdates %></span>
+                            <% } %>
+                        <% } %>
+                    </li>
+                    <li><a href="/support/contact" class="nav-link">Support</a></li>
+
+                    <!-- Account Dropdown -->
+                    <li class="nav-dropdown">
+                        <input type="checkbox" id="account-dropdown-toggle" class="dropdown-checkbox">
+                        <label for="account-dropdown-toggle" class="nav-dropdown-toggle">
+                            <span class="user-name"><%= user.displayname || user.username || 'User' %></span>
+                            <span class="dropdown-arrow">▼</span>
+                        </label>
+                        <div class="nav-dropdown-menu" id="accountDropdown">
+                            <div class="dropdown-section">
+                                <div class="dropdown-header">Account</div>
+                                <a href="/profile" class="dropdown-link">My Profile</a>
+                                <a href="/support/messages" class="dropdown-link">My Messages</a>
+                            </div>
+
+                            <% if (user.isVendor) { %>
+                                <div class="dropdown-section">
+                                    <div class="dropdown-header">Vendor</div>
+                                    <a href="/vendor/dashboard" class="dropdown-link">Dashboard</a>
+                                    <a href="/vendor/products" class="dropdown-link">My Products</a>
+                                    <a href="/vendor/orders" class="dropdown-link">Orders</a>
+                                    <a href="/vendor/profile" class="dropdown-link">Vendor Profile</a>
+                                    <a href="/vendor/wallet" class="dropdown-link">Wallet</a>
+                                </div>
+                            <% } else { %>
+                                <div class="dropdown-section">
+                                    <a href="/vendor/apply" class="dropdown-link vendor-apply">Become a Vendor</a>
+                                </div>
+                            <% } %>
+
+                            <% if (user.username === 'admin') { %>
+                                <div class="dropdown-section">
+                                    <div class="dropdown-header">Admin</div>
+                                    <a href="/admin/dashboard" class="dropdown-link admin-link">Admin Panel</a>
+                                </div>
+                            <% } %>
+
+                            <div class="dropdown-section">
+                                <a href="/auth/logout" class="dropdown-link logout">Logout</a>
+                            </div>
+                        </div>
+                    </li>
+                <% } else { %>
+                    <!-- Guest navigation -->
+                    <li><a href="/auth/login" class="nav-link btn-login">Login</a></li>
+                    <li><a href="/auth/register" class="nav-link btn-register">Register</a></li>
+                <% } %>
+            </ul>
+        </nav>
+
+        <!-- Mobile menu toggle -->
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
 </header>
+
+<script>
+    function toggleDropdown(event, dropdownId) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Close all other dropdowns
+        document.querySelectorAll('.nav-dropdown-menu').forEach(menu => {
+            if (menu.id !== dropdownId) {
+                menu.classList.remove('show');
+            }
+        });
+
+        // Toggle the clicked dropdown
+        const dropdown = document.getElementById(dropdownId);
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    }
+
+    // Enhanced dropdown functionality with checkbox fallback
+    document.addEventListener('DOMContentLoaded', function() {
+        // Make labels clickable for dropdown functionality
+        document.querySelectorAll('.nav-dropdown-toggle').forEach(function(toggle) {
+            toggle.addEventListener('click', function(event) {
+                event.preventDefault();
+                const checkbox = this.previousElementSibling;
+                if (checkbox && checkbox.type === 'checkbox') {
+                    checkbox.checked = !checkbox.checked;
+                }
+            });
+        });
+    });
+
+    function toggleMobileMenu() {
+        const nav = document.querySelector('.main-nav');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+
+        nav.classList.toggle('mobile-open');
+        toggle.classList.toggle('active');
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.nav-dropdown')) {
+            document.querySelectorAll('.nav-dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+
+        // Close mobile menu when clicking outside
+        if (!event.target.closest('.main-nav') && !event.target.closest('.mobile-menu-toggle')) {
+            document.querySelector('.main-nav').classList.remove('mobile-open');
+            document.querySelector('.mobile-menu-toggle').classList.remove('active');
+        }
+    });
+
+    // Close mobile menu when window is resized to desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            document.querySelector('.main-nav').classList.remove('mobile-open');
+            document.querySelector('.mobile-menu-toggle').classList.remove('active');
+        }
+    });
+</script>

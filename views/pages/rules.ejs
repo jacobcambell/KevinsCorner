@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rules & Guidelines - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+    
+    <main>
+        <div class="rules-container">
+            <h1>Rules & Guidelines</h1>
+            
+            <section class="rules-section">
+                <h2>General Marketplace Rules</h2>
+                <ul>
+                    <li>All users must be 18 years or older to participate in the marketplace</li>
+                    <li>Users are responsible for maintaining the security of their accounts</li>
+                    <li>Multiple accounts per person are not permitted</li>
+                    <li>Any fraudulent activity will result in immediate account termination</li>
+                    <li>Respect all other users and maintain professional communication</li>
+                </ul>
+            </section>
+
+            <section class="rules-section">
+                <h2>Vendor Guidelines</h2>
+                <ul>
+                    <li>All products must be accurately described with clear images</li>
+                    <li>Vendors must honor all sales and provide items as described</li>
+                    <li>Response time to customer inquiries should not exceed 24 hours</li>
+                    <li>Shipping times must be clearly communicated to buyers</li>
+                    <li>Vendors are responsible for handling customer disputes professionally</li>
+                    <li>Digital products must be delivered within 24 hours of purchase</li>
+                </ul>
+            </section>
+
+            <section class="rules-section">
+                <h2>Prohibited Items & Activities</h2>
+                <ul>
+                    <li>Illegal items or services of any kind</li>
+                    <li>Stolen or counterfeit goods</li>
+                    <li>Items that violate intellectual property rights</li>
+                    <li>Harmful or dangerous substances</li>
+                    <li>Adult content or services</li>
+                    <li>Gambling or lottery activities</li>
+                    <li>Personal information trading</li>
+                    <li>Manipulation of reviews or ratings</li>
+                </ul>
+            </section>
+
+            <section class="rules-section">
+                <h2>Payment & Security</h2>
+                <ul>
+                    <li>All transactions must go through the official marketplace payment system</li>
+                    <li>Off-platform payments are strictly prohibited</li>
+                    <li>Funds are held in escrow until successful delivery confirmation</li>
+                    <li>Dispute resolution will be handled by marketplace administrators</li>
+                    <li>Users should enable two-factor authentication for enhanced security</li>
+                </ul>
+            </section>
+
+            <section class="rules-section">
+                <h2>Dispute Resolution</h2>
+                <ul>
+                    <li>Buyers have 7 days after delivery to report issues</li>
+                    <li>All disputes must be filed through the official support system</li>
+                    <li>Both parties will be given opportunity to provide evidence</li>
+                    <li>Administrator decisions on disputes are final</li>
+                    <li>Repeated false disputes may result in account restrictions</li>
+                </ul>
+            </section>
+
+            <section class="rules-section">
+                <h2>Account Penalties</h2>
+                <ul>
+                    <li><strong>Warning:</strong> First violation of minor rules</li>
+                    <li><strong>Temporary Ban:</strong> Repeated violations or moderate rule breaking</li>
+                    <li><strong>Permanent Ban:</strong> Serious violations, illegal activity, or repeated offenses</li>
+                    <li><strong>Asset Forfeiture:</strong> Funds may be seized for fraudulent activity</li>
+                </ul>
+            </section>
+
+            <section class="rules-section">
+                <h2>Privacy & Data Protection</h2>
+                <ul>
+                    <li>User data is protected according to our privacy policy</li>
+                    <li>Personal information should not be shared between users</li>
+                    <li>Communication should remain within the platform's messaging system</li>
+                    <li>Users may request data deletion upon account termination</li>
+                </ul>
+            </section>
+
+            <div class="rules-footer">
+                <p><strong>Last Updated:</strong> <%= new Date().toLocaleDateString() %></p>
+                <p>These rules are subject to change. Users will be notified of any significant updates.</p>
+                <p>By using this marketplace, you agree to abide by all rules and guidelines listed above.</p>
+            </div>
+
+            <div class="links">
+                <a href="/">← Back to Home</a> | 
+                <a href="/support/contact">Contact Support</a>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>

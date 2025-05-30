@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Support Messages - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Kevin's Corner - Admin Panel</h1>
+        <div style="float: right;">
+            Welcome, <%= user.displayname %>! 
+            <form method="POST" action="/auth/logout" style="display: inline;">
+                <button type="submit" style="background: none; border: none; color: white; cursor: pointer; text-decoration: underline;">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <main>
+        <div class="admin-panel">
+            <h2>Support Messages</h2>
+            
+            <div class="admin-nav">
+                <nav>
+                    <ul>
+                        <li><a href="/admin/dashboard">← Back to Dashboard</a></li>
+                        <li><a href="/admin/users">Manage Users</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+
+            <% if (messages.length > 0) { %>
+                <div class="support-messages-admin">
+                    <% messages.forEach(message => { %>
+                        <div class="admin-message-card">
+                            <div class="message-header">
+                                <h3><%= message.subject %></h3>
+                                <div class="message-meta">
+                                    <span class="status-badge <%= message.status %>"><%= message.status %></span>
+                                    <span>From: <strong><%= message.displayname %></strong> (@<%= message.username %>)</span>
+                                    <span>Created: <%= new Date(message.created_at).toLocaleString() %></span>
+                                    <span>Last Activity: <%= new Date(message.last_activity).toLocaleString() %></span>
+                                </div>
+                            </div>
+                            
+                            <div class="message-content">
+                                <div class="original-message">
+                                    <p><strong>Original Message:</strong></p>
+                                    <p><%= message.message %></p>
+                                </div>
+                                
+                                <!-- Thread Replies -->
+                                <% if (message.replies && message.replies.length > 0) { %>
+                                    <div class="message-thread">
+                                        <h4>Conversation History:</h4>
+                                        <% message.replies.forEach(reply => { %>
+                                            <div class="thread-reply <%= reply.sender_type %>-reply">
+                                                <div class="reply-header">
+                                                    <strong>
+                                                        <% if (reply.sender_type === 'admin') { %>
+                                                            🛠️ Admin (<%= reply.sender_name %>)
+                                                        <% } else { %>
+                                                            👤 <%= message.displayname %>
+                                                        <% } %>
+                                                    </strong>
+                                                    <small class="reply-timestamp"><%= new Date(reply.created_at).toLocaleString() %></small>
+                                                </div>
+                                                <p><%= reply.reply_text %></p>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                            </div>
+                            
+                            <!-- Admin Actions -->
+                            <% if (message.status !== 'closed') { %>
+                                <div class="message-actions">
+                                    <h4>Admin Response:</h4>
+                                    <form method="POST" action="/admin/support/<%= message.id %>/respond" style="margin-bottom: 10px;">
+                                        <div class="form-group">
+                                            <textarea name="admin_response" placeholder="Type your response..." rows="3" required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-small">Send Response</button>
+                                    </form>
+                                    <div class="admin-action-buttons">
+                                        <form method="POST" action="/admin/support/<%= message.id %>/close" style="display: inline; margin-right: 10px;">
+                                            <button type="submit" class="btn btn-small btn-warning">Close Conversation</button>
+                                        </form>
+                                        <form method="POST" action="/admin/support/<%= message.id %>/delete" style="display: inline;"
+                                              onsubmit="return confirm('Are you sure you want to permanently delete this message? This action cannot be undone.')">
+                                            <button type="submit" class="btn btn-small btn-danger">Delete Message</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <% } else { %>
+                                <div class="closed-notice">
+                                    <p><em>This conversation has been closed.</em></p>
+                                    <div class="admin-action-buttons">
+                                        <form method="POST" action="/admin/support/<%= message.id %>/reopen" style="display: inline; margin-right: 10px;">
+                                            <button type="submit" class="btn btn-small btn-info">Reopen Conversation</button>
+                                        </form>
+                                        <form method="POST" action="/admin/support/<%= message.id %>/delete" style="display: inline;"
+                                              onsubmit="return confirm('Are you sure you want to permanently delete this message? This action cannot be undone.')">
+                                            <button type="submit" class="btn btn-small btn-danger">Delete Message</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <p>No support messages found.</p>
+            <% } %>
+        </div>
+    </main>
+    <%- include('../partials/footer') %>
+</body>
+</html>

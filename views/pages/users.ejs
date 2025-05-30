@@ -1,19 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Users</title>
+    <title>Users - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Users</h1>
-    <% if (users.length > 0) { %>
-        <ul>
-            <% users.forEach(user => { %>
-                <li><%= user.username %> (<%= user.email %>)</li>
-            <% }); %>
-        </ul>
-    <% } else { %>
-        <p>No users found.</p>
-    <% } %>
-    <p><a href="/">Back to Home</a></p>
+    <header>
+        <h1>Kevin's Corner</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="user-list">
+            <h2>Registered Users</h2>
+            <% if (users.length > 0) { %>
+                <ul>
+                    <% users.forEach(user => { %>
+                        <li><strong><%= user.displayname %></strong> (@<%= user.username %>)</li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <p>No users found.</p>
+            <% } %>
+        </div>
+        <div class="links">
+            <p><a href="/">← Back to Home</a></p>
+        </div>
+
+        <div class="vendor-info">
+            <% if (product.vendor_avatar) { %>
+                <img src="<%= product.vendor_avatar %>" alt="<%= product.vendor_name %>" class="vendor-avatar">
+            <% } else { %>
+                <div class="vendor-avatar-placeholder">
+                    <%= product.vendor_displayname.charAt(0).toUpperCase() %>
+                </div>
+            <% } %>
+            <div class="vendor-details">
+                <div class="vendor-name">
+                    <% if (product.vendor_country_flag) { %>
+                        <span class="vendor-flag"><%= product.vendor_country_flag %></span>
+                    <% } %>
+                    <%= product.vendor_name %>
+                </div>
+                <div class="vendor-location"><%= product.vendor_displayname %></div>
+                <% if (product.vendor_rating) { %>
+                    <div class="vendor-rating">
+                        <span class="rating-stars">★★★★★</span>
+                        <span class="rating-count">(<%= product.rating_count %>)</span>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
 </body>
 </html>

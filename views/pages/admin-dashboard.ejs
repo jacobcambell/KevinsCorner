@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Kevin's Corner - Admin Panel</h1>
+        <div style="float: right;">
+            Welcome, <%= user.displayname %>! 
+            <form method="POST" action="/auth/logout" style="display: inline;">
+                <button type="submit" style="background: none; border: none; color: white; cursor: pointer; text-decoration: underline;">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <main>
+        <div class="admin-panel">
+            <h2>Admin Dashboard</h2>
+
+            <div class="admin-nav">
+                <nav>
+                    <ul>
+                        <li><a href="/">← Back to Home</a></li>
+                        <li><a href="/admin/users">Manage Users</a></li>
+                        <li><a href="/admin/support">Support Messages</a></li>
+                        <li><a href="/admin/dispute-center">Dispute Center</a></li>
+                        <li><a href="/admin/forum-categories">Forum Categories</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="admin-stats">
+                <h3>System Overview</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Total Users</h4>
+                        <p class="stat-number"><%= users.length %></p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Vendors</h4>
+                        <p class="stat-number"><%= users.filter(u => u.is_vendor === 1).length %></p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Regular Users</h4>
+                        <p class="stat-number"><%= users.filter(u => u.is_vendor !== 1).length %></p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Orders Processing</h4>
+                        <p class="stat-number"><%= stats.ordersProcessing %></p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Paid Vendor Fee</h4>
+                        <p class="stat-number">$<%= stats.paidVendorFee %></p>
+                    </div>
+                <div class="stat-card">
+                    <h4>In Escrow (After Fee)</h4>
+                    <p class="stat-number">$<%= stats.inEscrow %></p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Escrow Fee (5%)</h4>
+                    <p class="stat-number">$<%= stats.escrowFee %></p>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Total Market Fees</h4>
+                    <p class="stat-number">$<%= stats.marketFee %></p>
+                </div>
+                    <div class="stat-card">
+                        <h4>Disputes Open</h4>
+                        <p class="stat-number">
+                            <a href="/admin/dispute-center" style="color: inherit; text-decoration: none;">
+                                <%= stats.disputesOpen %>
+                            </a>
+                        </p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Completed Orders</h4>
+                        <p class="stat-number"><%= stats.completedOrders %></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-users">
+                <h3>Recent Users</h3>
+                <% if (users.length > 0) { %>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Display Name</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.slice(0, 10).forEach(u => { %>
+                                <tr>
+                                    <td><%= u.id %></td>
+                                    <td><%= u.username %></td>
+                                    <td><%= u.displayname %></td>
+                                    <td>
+                                        <span class="status-badge <%= u.is_vendor === 1 ? 'vendor' : 'user' %>">
+                                            <%= u.is_vendor === 1 ? 'Vendor' : 'User' %>
+                                        </span>
+                                        <% if (u.is_vendor === 1 && u.is_trusted_vendor === 1) { %>
+                                            <span class="status-badge trusted">Trusted</span>
+                                        <% } %></td>
+                                    <td><%= new Date(u.created_at).toLocaleDateString() %></td>
+                                    <td>
+                                        <% if (u.is_vendor === 1) { %>
+                                            <% if (u.is_trusted_vendor === 1) { %>
+                                                <form method="POST" action="/admin/remove-trusted-vendor/<%= u.id %>" style="display: inline;">
+                                                    <button type="submit" class="btn btn-sm btn-warning">Remove Trusted</button>
+                                                </form>
+                                            <% } else { %>
+                                                <form method="POST" action="/admin/make-trusted-vendor/<%= u.id %>" style="display: inline;">
+                                                    <button type="submit" class="btn btn-sm btn-success">Make Trusted</button>
+                                                </form>
+                                            <% } %>
+                                        <% } %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <p>No users found.</p>
+                <% } %>
+            </div>
+        </div>
+    </main>
+    <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+    
+    <main>
+        <div class="form-container">
+            <h2>My Profile</h2>
+            
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            
+            <div class="profile-info">
+                <!-- Avatar Section -->
+                <div class="form-group avatar-section">
+                    <label>Profile Avatar:</label>
+                    <div class="avatar-display">
+                        <% if (profileUser.avatar) { %>
+                            <img src="<%= profileUser.avatar %>" alt="Profile Avatar" class="profile-avatar-large">
+                        <% } else { %>
+                            <div class="default-avatar-large">
+                                <span><%= profileUser.displayname.charAt(0).toUpperCase() %></span>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Username:</label>
+                    <p><%= profileUser.username %></p>
+                </div>
+                
+                <div class="form-group">
+                    <label>Display Name:</label>
+                    <p><%= profileUser.displayname %></p>
+                </div>
+                
+                <div class="form-group">
+                    <label>Account Type:</label>
+                    <p>
+                        <% if (profileUser.is_vendor === 1) { %>
+                            <span class="status-badge vendor">Vendor</span>
+                        <% } else { %>
+                            <span class="status-badge user">User</span>
+                        <% } %>
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label>Member Since:</label>
+                    <p><%= new Date(profileUser.created_at).toLocaleDateString() %></p>
+                </div>
+            </div>
+
+            <!-- Profile Settings Form -->
+            <form action="/profile/update-settings" method="POST" class="settings-form">
+                <h3>Profile Settings</h3>
+                
+                <div class="form-group">
+                    <label for="avatarUpload">Profile Avatar:</label>
+                    <input type="file" id="avatarUpload" accept="image/*" class="avatar-input">
+                    <input type="hidden" id="avatarBase64" name="avatarBase64">
+                    <p class="help-text">Upload a profile picture (max 5MB, image files only)</p>
+                    <div id="avatarPreview" class="avatar-preview">
+                        <% if (profileUser.avatar) { %>
+                            <img src="<%= profileUser.avatar %>" alt="Current Avatar" class="preview-image">
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="preferredCurrency">Preferred Currency:</label>
+                    <select id="preferredCurrency" name="preferredCurrency" class="currency-select">
+                        <option value="USD" <%= (profileUser.preferred_currency || 'USD') === 'USD' ? 'selected' : '' %>>USD - US Dollar ($)</option>
+                        <option value="GBP" <%= (profileUser.preferred_currency || 'USD') === 'GBP' ? 'selected' : '' %>>GBP - British Pound (£)</option>
+                        <option value="CAD" <%= (profileUser.preferred_currency || 'USD') === 'CAD' ? 'selected' : '' %>>CAD - Canadian Dollar (C$)</option>
+                        <option value="EUR" <%= (profileUser.preferred_currency || 'USD') === 'EUR' ? 'selected' : '' %>>EUR - Euro (€)</option>
+                        <option value="AUD" <%= (profileUser.preferred_currency || 'USD') === 'AUD' ? 'selected' : '' %>>AUD - Australian Dollar (A$)</option>
+                    </select>
+                    <p class="help-text">This will be used to display prices throughout the site</p>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Update Profile Settings</button>
+            </form>
+
+            <!-- Security Settings Form -->
+            <form action="/profile/update-security" method="POST" class="security-form">
+                <h3>Security Settings</h3>
+                
+                <div class="form-group">
+                    <label for="publicKey">Kleopatra Public Key:</label>
+                    <textarea 
+                        id="publicKey" 
+                        name="publicKey" 
+                        rows="10" 
+                        cols="80" 
+                        placeholder="Paste your Kleopatra public key here (e.g., -----BEGIN PGP PUBLIC KEY BLOCK-----)"
+                        class="public-key-textarea"
+                    ><%= profileUser.public_key || '' %></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="toggle-container">
+                        <input 
+                            type="checkbox" 
+                            name="twoFactorEnabled" 
+                            value="1"
+                            <%= profileUser.two_factor_enabled === 1 ? 'checked' : '' %>
+                            id="twoFactorToggle"
+                        >
+                        <span class="toggle-slider"></span>
+                        Enable Two-Factor Authentication (2FA)
+                    </label>
+                    <p class="help-text">When enabled, you'll need to decrypt a challenge message with your private key to login</p>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Update Security Settings</button>
+            </form>
+            
+            <div class="links">
+                <a href="/">← Back to Home</a>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <script>
+        // Avatar upload handling
+        document.getElementById('avatarUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+            
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result;
+                document.getElementById('avatarBase64').value = base64String;
+                
+                // Show preview
+                const preview = document.getElementById('avatarPreview');
+                preview.innerHTML = `<img src="${base64String}" alt="Avatar Preview" class="preview-image">`;
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+</body>
+</html>

@@ -6,5 +6,29 @@
 <body>
     <h1>Welcome to <%= title %></h1>
     <p>Your Node.js app with EJS and SQLite is running!</p>
+    <div class="vendor-info">
+        <% if (product.vendor_avatar) { %>
+            <img src="<%= product.vendor_avatar %>" alt="<%= product.vendor_name %>" class="vendor-avatar">
+        <% } else { %>
+            <div class="vendor-avatar-placeholder">
+                <%= product.vendor_displayname.charAt(0).toUpperCase() %>
+            </div>
+        <% } %>
+        <div class="vendor-details">
+            <div class="vendor-name">
+                <% if (product.vendor_country_flag) { %>
+                    <span class="vendor-flag"><%= product.vendor_country_flag %></span>
+                <% } %>
+                <%= product.vendor_name %>
+            </div>
+            <div class="vendor-location"><%= product.vendor_displayname %></div>
+            <% if (product.vendor_rating) { %>
+                <div class="vendor-rating">
+                    <span class="rating-stars">★★★★★</span>
+                    <span class="rating-count">(<%= product.rating_count %>)</span>
+                </div>
+            <% } %>
+        </div>
+    </div>
 </body>
 </html>

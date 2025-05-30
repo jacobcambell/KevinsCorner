@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Product Type - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .product-type-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .product-types {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .product-type-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .product-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-color: #28a745;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .type-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .type-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .type-description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .type-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .type-features li {
+            padding: 5px 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .type-features li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .product-types {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+    
+    <main>
+        <div class="product-type-container">
+            <h1>Add New Product</h1>
+            <p>Choose the type of product you want to add to your store:</p>
+            
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+            
+            <div class="product-types">
+                <a href="/vendor/add-product?type=physical" class="product-type-card">
+                    <span class="type-icon">📦</span>
+                    <h2 class="type-title">Physical Products</h2>
+                    <p class="type-description">Tangible items that require shipping and inventory management</p>
+                    <ul class="type-features">
+                        <li>Inventory tracking</li>
+                        <li>Shipping configuration</li>
+                        <li>Weight & dimensions</li>
+                        <li>Stock management</li>
+                    </ul>
+                </a>
+                
+                <a href="/vendor/add-product?type=digital" class="product-type-card">
+                    <span class="type-icon">💻</span>
+                    <h2 class="type-title">Digital Products</h2>
+                    <p class="type-description">Downloadable files, software, or digital services</p>
+                    <ul class="type-features">
+                        <li>Instant delivery</li>
+                        <li>Download limits</li>
+                        <li>No shipping required</li>
+                        <li>File management</li>
+                    </ul>
+                </a>
+            </div>
+            
+            <div class="links">
+                <a href="/vendor/products">← Back to Products</a>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>

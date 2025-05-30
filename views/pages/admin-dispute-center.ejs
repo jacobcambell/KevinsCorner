@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dispute Center - Kevin's Corner Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Kevin's Corner - Admin Panel</h1>
+        <div style="float: right;">
+            Welcome, <%= user.displayname %>! 
+            <form method="POST" action="/auth/logout" style="display: inline;">
+                <button type="submit" style="background: none; border: none; color: white; cursor: pointer; text-decoration: underline;">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <main>
+        <div class="admin-panel">
+            <h2>Dispute Center</h2>
+            
+            <div class="admin-nav">
+                <nav>
+                    <ul>
+                        <li><a href="/admin/dashboard">← Back to Dashboard</a></li>
+                        <li><a href="/admin/users">Manage Users</a></li>
+                        <li><a href="/admin/support">Support Messages</a></li>
+                        <li><a href="/admin/forum-categories">Forum Categories</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+
+            <div class="disputes-section">
+                <h3>Active Disputes (<%= disputes.length %>)</h3>
+                
+                <% if (disputes.length > 0) { %>
+                    <div class="disputes-container">
+                        <% disputes.forEach(dispute => { %>
+                            <div class="dispute-card">
+                                <div class="dispute-header">
+                                    <h4>Order #<%= dispute.order_number %></h4>
+                                    <span class="dispute-amount">$<%= parseFloat(dispute.total_price).toFixed(2) %></span>
+                                </div>
+                                
+                                <div class="dispute-details">
+                                    <div class="dispute-info">
+                                        <p><strong>Product:</strong> <%= dispute.product_name || 'Product not found' %></p>
+                                        <p><strong>Order Date:</strong> <%= new Date(dispute.created_at).toLocaleDateString() %></p>
+                                        <p><strong>Buyer:</strong> <%= dispute.buyer_displayname %> (@<%= dispute.buyer_username %>)</p>
+                                        <p><strong>Vendor:</strong> <%= dispute.vendor_displayname %> (@<%= dispute.vendor_username %>)</p>
+                                    </div>
+                                    
+                                    <div class="dispute-actions">
+                                        <form method="POST" action="/admin/dispute-center/<%= dispute.id %>/resolve-buyer" style="display: inline;">
+                                            <div class="form-group">
+                                                <label for="resolution_notes_buyer_<%= dispute.id %>">Resolution Notes:</label>
+                                                <textarea 
+                                                    name="resolution_notes" 
+                                                    id="resolution_notes_buyer_<%= dispute.id %>"
+                                                    placeholder="Reason for resolving in buyer's favor..."
+                                                    rows="2"
+                                                    style="width: 100%; margin-bottom: 10px;"
+                                                ></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-success" onclick="return confirm('Resolve dispute in favor of buyer? This will issue a refund.')">
+                                                ✓ Resolve for Buyer (Refund)
+                                            </button>
+                                        </form>
+                                        
+                                        <form method="POST" action="/admin/dispute-center/<%= dispute.id %>/resolve-vendor" style="display: inline; margin-left: 10px;">
+                                            <div class="form-group">
+                                                <label for="resolution_notes_vendor_<%= dispute.id %>">Resolution Notes:</label>
+                                                <textarea 
+                                                    name="resolution_notes" 
+                                                    id="resolution_notes_vendor_<%= dispute.id %>"
+                                                    placeholder="Reason for resolving in vendor's favor..."
+                                                    rows="2"
+                                                    style="width: 100%; margin-bottom: 10px;"
+                                                ></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary" onclick="return confirm('Resolve dispute in favor of vendor? This will release payment.')">
+                                                ✓ Resolve for Vendor (Release Payment)
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="no-disputes">
+                        <p>No active disputes at this time.</p>
+                        <p>Great job! The marketplace is running smoothly.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <style>
+        .disputes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .dispute-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        
+        .dispute-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .dispute-header h4 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .dispute-amount {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .dispute-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .dispute-info p {
+            margin: 5px 0;
+        }
+        
+        .dispute-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .dispute-actions .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .dispute-actions label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .no-disputes {
+            text-align: center;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .dispute-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .dispute-actions {
+                margin-top: 15px;
+            }
+        }
+    </style>
+</body>
+</html>

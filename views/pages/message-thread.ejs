@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation with <%= otherParticipant.displayname %> - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <main>
+        <div class="thread-container">
+            <!-- Thread Header -->
+            <div class="thread-header-section">
+                <h1 class="thread-title">
+                    <span>💬</span>
+                    Conversation
+                </h1>
+                <div class="thread-participant">
+                    📧 With: <strong><%= otherParticipant.displayname %></strong>
+                </div>
+            </div>
+
+            <!-- Thread Actions -->
+            <div class="page-header" style="padding: 20px 30px; background: #f8f9fa; border-bottom: 1px solid #e9ecef;">
+                <div class="thread-actions">
+                    <a href="/messages" class="btn btn-secondary">
+                        <span>←</span> Back to Inbox
+                    </a>
+                    <form method="POST" action="/messages/thread/<%= thread.id %>/delete" class="delete-conversation-form" onsubmit="return confirm('Are you sure you want to delete this entire conversation? This action cannot be undone and will delete all messages in this thread.')">
+                        <button type="submit" class="btn btn-danger">
+                            <span>🗑️</span> Delete Conversation
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <% if (error) { %>
+                <div class="error" style="margin: 20px 30px;">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <!-- Messages Thread -->
+            <div class="messages-container">
+                <% if (messages && messages.length > 0) { %>
+                    <% messages.forEach(message => { %>
+                        <div class="message <%= message.sender_id === user.id ? 'message-sent' : 'message-received' %>">
+                            <div class="message-avatar">
+                                <%= message.sender_displayname.charAt(0).toUpperCase() %>
+                            </div>
+                            <div class="message-body">
+                                <div class="message-header">
+                                    <span class="sender-name"><%= message.sender_displayname %></span>
+                                    <span class="message-time">
+                                        <%= new Date(message.created_at).toLocaleDateString('en-US', { 
+                                            month: 'short', 
+                                            day: 'numeric',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        }) %>
+                                    </span>
+                                    <% if (message.sender_id === user.id) { %>
+                                        <form method="POST" action="/messages/message/<%= message.id %>/delete" class="delete-message-form" onsubmit="return confirm('Are you sure you want to delete this message?')">
+                                            <button type="submit" class="btn-delete-message" title="Delete message">×</button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                                <div class="message-content">
+                                    <%= message.content %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div style="text-align: center; padding: 40px; color: #6c757d;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">📭</div>
+                        <p>No messages in this conversation yet.</p>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Reply Form -->
+            <div class="reply-form" style="background: #f8f9fa; padding: 25px 30px;">
+                <h4 style="color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                    <span>✏️</span>
+                    Reply to <%= otherParticipant.displayname %>
+                </h4>
+
+                <!-- Message sent confirmation -->
+                <div id="messageSentConfirmation" class="message-sent-confirmation" style="display: none;">
+                    <span class="checkmark">✓</span>
+                    Message sent successfully!
+                </div>
+
+                <form method="POST" action="/messages/thread/<%= thread.id %>/reply" id="replyForm">
+                    <div class="form-group">
+                        <textarea name="message_content" id="messageContent" placeholder="Type your reply..." rows="4" required style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.9rem; resize: vertical; background: white;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="reply_pin" style="display: block; font-weight: 600; color: #495057; margin-bottom: 8px;">🔐 Your PIN:</label>
+                        <input type="password" id="reply_pin" name="pin" placeholder="Enter your PIN to send reply..." required autocomplete="current-password" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.9rem;">
+                    </div>
+                    <button type="submit" class="btn-send">
+                        <span>📤</span>
+                        Send Reply
+                    </button>
+                    </form>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        // Progressive enhancement - these features only work if JavaScript is enabled
+        // The core functionality works without JavaScript
+
+        function scrollToBottom() {
+            const container = document.querySelector('.messages-container');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        // Enhanced functionality when JavaScript is available
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'message_sent') {
+                // Clear the reply form
+                const messageField = document.getElementById('messageContent');
+
+                if (messageField) messageField.value = '';
+
+                // Remove success parameter from URL
+                const newUrl = window.location.pathname;
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState({}, document.title, newUrl);
+                }
+
+                // Scroll to bottom to show new message
+                setTimeout(() => scrollToBottom(), 100);
+            }
+
+            // Initial scroll to bottom
+            scrollToBottom();
+        });
+    </script>
+</body>
+</html>

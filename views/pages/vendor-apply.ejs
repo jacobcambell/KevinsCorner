@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Become a Vendor - Kevin's Corner Marketplace</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .vendor-hero {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            margin: -2rem -2rem 2rem -2rem;
+        }
+
+        .vendor-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .vendor-hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .vendor-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .vendor-card {
+            background: #2d2d2d;
+            border-radius: 12px;
+            padding: 30px 25px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: 2px solid #444;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 450px;
+        }
+
+        .vendor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .vendor-card.invite-card {
+            border-color: #28a745;
+        }
+
+        .vendor-card.paid-card {
+            border-color: #ffc107;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+        }
+
+        .invite-card .card-icon {
+            color: #28a745;
+        }
+
+        .paid-card .card-icon {
+            color: #ffc107;
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+            color: #e0e0e0;
+            font-weight: 600;
+        }
+
+        .card-price {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .invite-card .card-price {
+            color: #28a745;
+        }
+
+        .paid-card .card-price {
+            color: #ffc107;
+        }
+
+        .card-features {
+            list-style: none;
+            padding: 0;
+            margin: 25px 0;
+        }
+
+        .card-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #555;
+            color: #ccc;
+        }
+
+        .card-features li:last-child {
+            border-bottom: none;
+        }
+
+        .invite-form {
+            margin: 15px 0;
+        }
+
+        .invite-form input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #28a745;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            box-sizing: border-box;
+        }
+
+        .invite-form input:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+        }
+
+        .invite-form input::placeholder {
+            color: #999;
+        }
+
+        .btn-invite {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        .btn-invite:hover {
+            background: #218838;
+        }
+
+        .btn-paid {
+            background: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .btn-paid:hover {
+            background: #e0a800;
+        }
+
+        .benefits-section {
+            margin-top: 60px;
+            padding: 40px 20px;
+            background: #2a2a2a;
+            border-radius: 15px;
+            border: 1px solid #444;
+        }
+
+        .benefits-section h2 {
+            color: #e0e0e0;
+        }
+
+        .benefits-section p {
+            color: #ccc;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .benefit-item {
+            text-align: center;
+            padding: 20px;
+            background: #333;
+            border-radius: 8px;
+            border: 1px solid #555;
+        }
+
+        .benefit-item h3 {
+            color: #e0e0e0;
+            margin-bottom: 10px;
+        }
+
+        .benefit-item p {
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .benefit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .vendor-hero h1 {
+                font-size: 2rem;
+            }
+
+            .vendor-options {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .vendor-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <main>
+        <div class="vendor-hero">
+            <h1>Become a Vendor</h1>
+            <p>Choose your path to start selling on Kevin's Corner Marketplace</p>
+        </div>
+
+        <% if (error) { %>
+            <div class="error"><%= error %></div>
+        <% } %>
+        <% if (success) { %>
+            <div class="success"><%= success %></div>
+        <% } %>
+
+        <section class="vendor-options">
+            <!-- Invite Code Card -->
+            <div class="vendor-card invite-card">
+                <div class="card-icon">🎟️</div>
+                <h2 class="card-title">Have an Invite Code?</h2>
+                <div class="card-price">FREE</div>
+
+                <ul class="card-features">
+                    <li>✅ No setup fees</li>
+                    <li>✅ Instant approval</li>
+                    <li>✅ All vendor features</li>
+                    <li>✅ Priority support</li>
+                </ul>
+
+                <form class="invite-form" method="POST" action="/vendor/apply-with-invite">
+                    <input type="text" name="inviteCode" placeholder="Enter your invite code" required>
+                    <button type="submit" class="btn-invite">Apply with Invite Code</button>
+                </form>
+            </div>
+
+            <!-- Digital Products Only Card -->
+            <div class="vendor-card">
+                <div class="card-icon">📱</div>
+                <h2 class="card-title">Digital Products Only</h2>
+                <div class="card-price">$50</div>
+                <ul class="card-features">
+                    <li>✅ Sell digital products only</li>
+                    <li>✅ Download links & codes</li>
+                    <li>✅ Account credentials</li>
+                    <li>✅ Text-based content</li>
+                    <li>✅ Order management</li>
+                    <li>✅ Customer messaging</li>
+                    <li>✅ Basic analytics</li>
+                </ul>
+                <form method="POST" action="/vendor/create-digital-vendor-order">
+                    <button type="submit" class="btn-paid">Pay $50 & Apply</button>
+                </form>
+            </div>
+
+            <!-- Paid Option Card -->
+            <div class="vendor-card paid-card">
+                <div class="card-icon">💳</div>
+                <h2 class="card-title">Standard Application</h2>
+                <div class="card-price">$300</div>
+
+                <ul class="card-features">
+                    <li>✅ One-time setup fee</li>
+                    <li>✅ Manual review process</li>
+                    <li>✅ All vendor features</li>
+                    <li>✅ Full marketplace access</li>
+                </ul>
+
+                <form method="POST" action="/vendor/create-paid-order">
+                    <button type="submit" class="btn-paid">Pay $300 & Apply</button>
+                </form>
+            </div>
+
+            <!-- Website Search Engine Card -->
+            <div class="vendor-card">
+                <div class="card-icon">🔍</div>
+                <h2 class="card-title">Website URL Search Engine</h2>
+                <div class="card-price">$25</div>
+                <ul class="card-features">
+                    <li>✅ Submit your website to search engines</li>
+                    <li>✅ SEO optimization</li>
+                    <li>✅ Increased visibility</li>
+                    <li>✅ Google indexing assistance</li>
+                    <li>✅ One-time service</li>
+                </ul>
+                <form method="POST" action="/vendor/create-seo-order">
+                    <button type="submit" class="btn-paid">Pay $25 & Submit</button>
+                </form>
+            </div>
+
+            <!-- Forum Banner Ad Card -->
+            <div class="vendor-card">
+                <div class="card-icon">📢</div>
+                <h2 class="card-title">Forum Banner Ad</h2>
+                <div class="card-price">$100/month</div>
+                <ul class="card-features">
+                    <li>✅ Premium forum banner placement</li>
+                    <li>✅ High visibility advertising</li>
+                    <li>✅ Target forum users</li>
+                    <li>✅ Custom banner design support</li>
+                    <li>✅ Monthly recurring service</li>
+                </ul>
+                <form method="POST" action="/vendor/create-banner-order">
+                    <button type="submit" class="btn-paid">Pay $100/month</button>
+                </form>
+            </div>
+
+            <!-- Single Vendor Store Card -->
+            <div class="vendor-card">
+                <div class="card-icon">🏪</div>
+                <h2 class="card-title">Single Vendor Store</h2>
+                <div class="card-price">$25/month</div>
+                <div style="background: #28a745; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; margin: 10px 0; text-align: center;">
+                    Try it Free 1 week Coming Soon
+                </div>
+                <ul class="card-features">
+                    <li>✅ Dedicated vendor storefront</li>
+                    <li>✅ Custom branding options</li>
+                    <li>✅ Independent store management</li>
+                    <li>✅ Enhanced product showcase</li>
+                    <li>✅ Priority listing placement</li>
+                    <li>✅ Advanced analytics dashboard</li>
+                </ul>
+                <form method="POST" action="/vendor/create-store-order">
+                    <button type="submit" class="btn-paid" disabled style="opacity: 0.6; cursor: not-allowed;">
+                        Coming Soon - $25/month
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section class="benefits-section">
+            <h2 style="text-align: center; color: #2c3e50; margin-bottom: 10px;">Why Become a Vendor?</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">Join thousands of successful sellers on our platform</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-icon">🏪</div>
+                    <h3>Your Storefront</h3>
+                    <p>Get a dedicated space to showcase your products with custom branding.</p>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="benefit-icon">📈</div>
+                    <h3>Analytics</h3>
+                    <p>Track sales, customer behavior, and optimize your business.</p>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="benefit-icon">🚀</div>
+                    <h3>Marketing Support</h3>
+                    <p>Benefit from our marketing campaigns and promotional features.</p>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="benefit-icon">💳</div>
+                    <h3>Secure Payments</h3>
+                    <p>Get paid quickly and securely with XMR and other payment options.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="links" style="text-align: center; margin-top: 40px;">
+            <p><a href="/">← Back to Home</a></p>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

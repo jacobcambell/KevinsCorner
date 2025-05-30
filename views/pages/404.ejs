@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+    
+    <main>
+        <div class="form-container">
+            <div class="error-container">
+                <h1>404 - Page Not Found</h1>
+                <div class="error-icon">🔍</div>
+                <p>Sorry, the page you're looking for doesn't exist.</p>
+                <p>The URL may be incorrect or the page may have been moved or deleted.</p>
+                
+                <div class="error-actions">
+                    <a href="/" class="btn btn-primary">← Back to Home</a>
+                    <a href="/forums" class="btn btn-secondary">Browse Forums</a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <style>
+        .error-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .error-container h1 {
+            color: #e74c3c;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .error-icon {
+            font-size: 4em;
+            margin: 20px 0;
+        }
+        
+        .error-container p {
+            color: #666;
+            font-size: 1.1em;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .error-actions {
+            margin-top: 30px;
+        }
+        
+        .error-actions .btn {
+            margin: 0 10px;
+            display: inline-block;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</body>
+</html>

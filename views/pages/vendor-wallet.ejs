@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Wallet - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .wallet-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .wallet-header {
+            background: linear-gradient(135deg, #1a252f, #2c3e50);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .wallet-balance {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .balance-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .balance-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #28a745;
+            margin: 10px 0;
+        }
+
+        .balance-currency {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .wallet-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .wallet-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-btn:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-2px);
+        }
+
+        .wallet-btn.secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+
+        .wallet-btn.success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+
+        .transactions-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #333;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            background: #f8f9fa;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-type {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .transaction-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .transaction-amount.positive {
+            color: #28a745;
+        }
+
+        .transaction-amount.negative {
+            color: #dc3545;
+        }
+
+        .payout-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .payout-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .wallet-balance {
+                flex-direction: column;
+            }
+
+            .wallet-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .transaction-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+    <%- include('../partials/vendor-nav') %>
+
+    <main>
+        <div class="wallet-container">
+            <div class="wallet-header">
+                <h1>💰 Vendor Wallet</h1>
+                <p>Manage your earnings and payouts</p>
+            </div>
+
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+
+            <!-- Balance Cards -->
+            <div class="wallet-balance">
+                <div class="balance-card">
+                    <h3>💵 Available Balance</h3>
+                    <div class="balance-amount">$<%= availableBalance.toFixed(2) %></div>
+                    <div class="balance-currency">USD</div>
+                </div>
+                <div class="balance-card">
+                    <h3>⏳ Pending Earnings</h3>
+                    <div class="balance-amount">$<%= pendingBalance.toFixed(2) %></div>
+                    <div class="balance-currency">USD</div>
+                </div>
+                <div class="balance-card">
+                    <h3>📈 Total Earned</h3>
+                    <div class="balance-amount">$<%= totalEarned.toFixed(2) %></div>
+                    <div class="balance-currency">USD</div>
+                </div>
+            </div>
+
+            <!-- Wallet Actions -->
+            <div class="wallet-actions">
+                <button class="wallet-btn success" onclick="showPayoutModal()">
+                    💸 Request Payout
+                </button>
+                <a href="/vendor/orders" class="wallet-btn">
+                    📋 View Orders
+                </a>
+                <button class="wallet-btn secondary" onclick="showPayoutHistory()">
+                    📊 Payout History
+                </button>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="transactions-section">
+                <h2 class="section-title">📝 Recent Transactions</h2>
+                
+                <% if (transactions && transactions.length > 0) { %>
+                    <% transactions.forEach(transaction => { %>
+                        <div class="transaction-item">
+                            <div class="transaction-details">
+                                <div class="transaction-type">
+                                    <%= transaction.type === 'sale' ? '💰' : transaction.type === 'payout' ? '💸' : '📋' %> 
+                                    <%= transaction.description %>
+                                </div>
+                                <div class="transaction-date">
+                                    <%= new Date(transaction.created_at).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'short', 
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }) %>
+                                </div>
+                                <% if (transaction.order_id) { %>
+                                    <div class="transaction-date">Order #<%= transaction.order_id %></div>
+                                <% } %>
+                            </div>
+                            <div class="transaction-amount <%= transaction.amount > 0 ? 'positive' : 'negative' %>">
+                                <%= transaction.amount > 0 ? '+' : '' %>$<%= Math.abs(transaction.amount).toFixed(2) %>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i>📭</i>
+                        <h3>No transactions yet</h3>
+                        <p>Your wallet transactions will appear here once you start making sales.</p>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Payout Request Section -->
+            <div class="payout-section">
+                <h2 class="section-title">💸 Request Payout</h2>
+                
+                <% if (availableBalance >= 10) { %>
+                    <form action="/vendor/wallet/request-payout" method="POST" class="payout-form">
+                        <div class="form-group">
+                            <label for="payoutAmount">Payout Amount (USD)</label>
+                            <input 
+                                type="number" 
+                                id="payoutAmount" 
+                                name="payoutAmount" 
+                                class="form-control"
+                                min="10" 
+                                max="<%= availableBalance %>" 
+                                step="0.01"
+                                placeholder="Enter amount to withdraw"
+                                required
+                            >
+                            <div class="help-text">
+                                Minimum payout: $10.00 | Available: $<%= availableBalance.toFixed(2) %>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="payoutMethod">Payout Method</label>
+                            <select id="payoutMethod" name="payoutMethod" class="form-control" required>
+                                <option value="">Select payout method</option>
+                                <option value="monero">Monero (XMR)</option>
+                                <option value="bitcoin">Bitcoin (BTC)</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="bank">Bank Transfer</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="payoutAddress">Payout Address/Details</label>
+                            <textarea 
+                                id="payoutAddress" 
+                                name="payoutAddress" 
+                                class="form-control"
+                                rows="3"
+                                placeholder="Enter your wallet address, PayPal email, or bank details"
+                                required
+                            ></textarea>
+                            <div class="help-text">
+                                For crypto: Enter your wallet address<br>
+                                For PayPal: Enter your PayPal email<br>
+                                For Bank: Enter your account details
+                            </div>
+                        </div>
+
+                        <button type="submit" class="wallet-btn success" style="width: 100%;">
+                            Submit Payout Request
+                        </button>
+                    </form>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i>💰</i>
+                        <h3>Minimum Balance Required</h3>
+                        <p>You need at least $10.00 in available balance to request a payout.</p>
+                        <p>Current available balance: $<%= availableBalance.toFixed(2) %></p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        function showPayoutModal() {
+            document.querySelector('.payout-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showPayoutHistory() {
+            // This could open a modal or redirect to a payout history page
+            alert('Payout history feature coming soon!');
+        }
+
+        // Auto-calculate equivalent crypto amounts when amount changes
+        document.getElementById('payoutAmount')?.addEventListener('input', function() {
+            const amount = parseFloat(this.value);
+            const method = document.getElementById('payoutMethod').value;
+            
+            if (amount && method === 'monero') {
+                // You could fetch current XMR price and show equivalent
+                console.log('Calculate XMR equivalent for $' + amount);
+            }
+        });
+    </script>
+</body>
+</html>

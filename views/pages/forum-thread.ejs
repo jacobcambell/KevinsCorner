@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= thread.title %> - Forums - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <% 
+    // Helper function for time formatting
+    function formatServerTime(timestamp) {
+        if (!timestamp) return 'Unknown';
+        const date = new Date(timestamp);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'UTC'
+        }) + ' UTC';
+    }
+    %>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #d7dadc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Reddit-style thread header */
+        .thread-header {
+            background: #1a1a1b;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .thread-title {
+            color: #d7dadc;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 22px;
+            margin: 0 0 8px 0;
+        }
+
+        .thread-meta {
+            color: #818384;
+            font-size: 12px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .thread-badges {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+
+        .badge-pinned {
+            background: #46d160;
+            color: #000;
+        }
+
+        .badge-locked {
+            background: #ff4500;
+            color: #fff;
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+            color: #818384;
+        }
+
+        .breadcrumb a {
+            color: #4fbcff;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Reddit-style post layout */
+        .post-container {
+            display: flex;
+            background: #1a1a1b;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .post-voting {
+            background: #0f1419;
+            width: 40px;
+            padding: 8px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .vote-arrow {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            color: #818384;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .vote-arrow:hover {
+            background: #272729;
+        }
+
+        .vote-score {
+            font-size: 12px;
+            font-weight: 700;
+            color: #d7dadc;
+            text-align: center;
+        }
+
+        .post-content-area {
+            flex: 1;
+            padding: 8px 12px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .post-author {
+            color: #4fbcff;
+            font-weight: 400;
+            text-decoration: none;
+        }
+
+        .post-author:hover {
+            text-decoration: underline;
+        }
+
+        .op-badge {
+            background: #ff4500;
+            color: #fff;
+            padding: 0 4px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .post-date {
+            color: #818384;
+            font-size: 12px;
+        }
+
+        .post-content {
+            color: #d7dadc;
+            font-size: 14px;
+            line-height: 21px;
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+
+        .post-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .post-action {
+            color: #818384;
+            text-decoration: none;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        .post-action:hover {
+            background: #272729;
+        }
+
+        /* Original post styling */
+        .original-post {
+            border-left: 4px solid #ff4500;
+        }
+
+        .original-post .post-voting {
+            background: #1a1a1b;
+        }
+
+        /* Reply form Reddit style */
+        .reply-form {
+            background: #1a1a1b;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .reply-form h3 {
+            color: #d7dadc;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0 0 8px 0;
+        }
+
+        .reply-form textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 8px 12px;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            background: #272729;
+            color: #d7dadc;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 21px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .reply-form textarea:focus {
+            outline: none;
+            border-color: #4fbcff;
+        }
+
+        .reply-form textarea::placeholder {
+            color: #818384;
+        }
+
+        .btn-submit {
+            background: #ff4500;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #ff5722;
+        }
+
+        .locked-notice {
+            background: #1a1a1b;
+            border: 1px solid #ff4500;
+            border-radius: 4px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .locked-notice {
+            color: #ff4500;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Layout */
+        .forums-layout {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .forums-content {
+            flex: 1;
+            max-width: 740px;
+        }
+
+        .banner-sidebar {
+            width: 320px;
+            flex-shrink: 0;
+        }
+
+        .banner-container {
+            background: #1a1a1b;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            padding: 16px;
+        }
+
+        .banner-title {
+            color: #d7dadc;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 12px 0;
+            text-align: center;
+        }
+
+        .forum-banner {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .forum-banner-placeholder {
+            width: 100%;
+            height: 60px;
+            background: #272729;
+            border: 1px solid #343536;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #818384;
+            margin-bottom: 8px;
+        }
+
+        .no-banners {
+            text-align: center;
+            color: #818384;
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        .links a {
+            color: #4fbcff;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .forums-layout {
+                flex-direction: column;
+                padding: 12px;
+            }
+
+            .banner-sidebar {
+                width: 100%;
+                order: -1;
+            }
+
+            .post-voting {
+                width: 32px;
+                padding: 4px 2px;
+            }
+
+            .vote-arrow {
+                width: 20px;
+                height: 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <main>
+        <div class="forums-layout">
+            <div class="forums-content">
+                <div class="forum-thread-container">
+                    <div class="thread-header">
+                        <h1><%= thread.title %></h1>
+
+                        <div class="thread-meta">
+                            Started by <%= thread.created_by_displayname %> • 
+                            <%= formatServerTime(thread.created_at) %> • 
+                            <%= thread.reply_count || 0 %> replies
+                        </div>
+
+                        <% if (thread.is_pinned === 1 || thread.is_locked === 1) { %>
+                            <div class="thread-badges">
+                                <% if (thread.is_pinned === 1) { %>
+                                    <span class="badge badge-pinned">📌 Pinned</span>
+                                <% } %>
+                                <% if (thread.is_locked === 1) { %>
+                                    <span class="badge badge-locked">🔒 Locked</span>
+                                <% } %>
+                            </div>
+                        <% } %>
+
+                        <div class="breadcrumb">
+                            <a href="/forums">Forums</a> > 
+                            <a href="/forums/category/<%= thread.category_id %>"><%= thread.category_name %></a> > 
+                            <%= thread.title %>
+                        </div>
+                    </div>
+
+                    <% if (error) { %>
+                        <div class="error"><%= error %></div>
+                    <% } %>
+                    <% if (success) { %>
+                        <div class="success"><%= success %></div>
+                    <% } %>
+
+                    <!-- Original Post -->
+                    <div class="post-container original-post">
+                        <div class="post-voting">
+                            <div class="vote-arrow">▲</div>
+                            <div class="vote-score">•</div>
+                            <div class="vote-arrow">▼</div>
+                        </div>
+                        <div class="post-content-area">
+                            <div class="post-header">
+                                <a href="#" class="post-author"><%= thread.created_by_displayname %></a>
+                                <span class="op-badge">OP</span>
+                                <span class="post-date">• <%= formatServerTime(thread.created_at) %></span>
+                            </div>
+                            <div class="post-content">
+                                <%- thread.content.replace(/\n/g, '<br>') %>
+                            </div>
+                            <div class="post-actions">
+                                <a href="#" class="post-action">💬 Reply</a>
+                                <a href="#" class="post-action">🔗 Share</a>
+                                <a href="#" class="post-action">⚠️ Report</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Replies -->
+                    <% if (posts && posts.length > 0) { %>
+                        <% posts.forEach(post => { %>
+                            <div class="post-container">
+                                <div class="post-voting">
+                                    <div class="vote-arrow">▲</div>
+                                    <div class="vote-score">•</div>
+                                    <div class="vote-arrow">▼</div>
+                                </div>
+                                <div class="post-content-area">
+                                    <div class="post-header">
+                                        <a href="#" class="post-author"><%= post.created_by_displayname %></a>
+                                        <span class="post-date">• <%= formatServerTime(post.created_at) %></span>
+                                    </div>
+                                    <div class="post-content">
+                                        <%- post.content.replace(/\n/g, '<br>') %>
+                                    </div>
+                                    <div class="post-actions">
+                                        <a href="#" class="post-action">💬 Reply</a>
+                                        <a href="#" class="post-action">🔗 Share</a>
+                                        <a href="#" class="post-action">⚠️ Report</a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } %>
+
+                    <!-- Reply Form -->
+                    <% if (user) { %>
+                        <% if (thread.is_locked === 1) { %>
+                            <div class="locked-notice">
+                                🔒 This thread is locked. No new replies can be added.
+                            </div>
+                        <% } else { %>
+                            <div class="reply-form">
+                                <h3>Post a Reply</h3>
+                                <form action="/forums/thread/<%= thread.id %>/reply" method="POST">
+                                    <div class="form-group">
+                                        <textarea name="content" placeholder="Write your reply here..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-submit">Post Reply</button>
+                                </form>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <div class="reply-form">
+                            <h3>Post a Reply</h3>
+                            <p>You must <a href="/auth/login">login</a> to post a reply.</p>
+                        </div>
+                    <% } %>
+
+                    <div class="links">
+                        <a href="/forums/category/<%= thread.category_id %>">← Back to <%= thread.category_name %></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="banner-sidebar">
+                <div class="banner-container">
+                    <h3 class="banner-title">🌟 90s BANNERS! 🌟</h3>
+                    <% if (banners && banners.length > 0) { %>
+                        <% banners.forEach(banner => { %>
+                            <% 
+                            let imageSrc = '';
+                            if (banner.image_data) {
+                                if (banner.image_data.startsWith('data:')) {
+                                    imageSrc = banner.image_data;
+                                } else {
+                                    imageSrc = `data:image/jpeg;base64,${banner.image_data}`;
+                                }
+                            }
+                            %>
+
+                            <% if (banner.link_url) { %>
+                                <a href="<%= banner.link_url %>" class="banner-link" target="_blank">
+                            <% } %>
+
+                            <% if (imageSrc) { %>
+                                <img src="<%= imageSrc %>" alt="<%= banner.title %>" class="forum-banner" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="forum-banner-placeholder" style="display: none;">
+                                    <%= banner.title %><br><small>Image Error</small>
+                                </div>
+                            <% } else { %>
+                                <div class="forum-banner-placeholder" style="display: flex;">
+                                    <%= banner.title %><br><small>No Image</small>
+                                </div>
+                            <% } %>
+
+                            <% if (banner.link_url) { %>
+                                </a>
+                            <% } %>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="no-banners">No banners yet!</div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>
+```This commit fixes an issue where the incorrect title was being displayed in the forum thread template.

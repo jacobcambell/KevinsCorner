@@ -1,0 +1,698 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .orders-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            min-height: 80vh;
+        }
+        
+        .order-card {
+            background: #2d2d2d;
+            border: 2px solid #444;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .order-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .order-body {
+            padding: 24px;
+            background: #2d2d2d;
+        }
+        
+        .order-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        
+        .info-item {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            padding: 14px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .info-item:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+        }
+        
+        .info-label {
+            font-weight: 700;
+            color: #e0e0e0;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        
+        .info-value {
+            color: #b0b0b0;
+            margin-top: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
+        .digital-content {
+            background: #1a2e1a;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .digital-content h4 {
+            color: #4caf50;
+            margin-top: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .content-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .content-item {
+            background: #2d2d2d;
+            border: 2px solid #28a745;
+            padding: 16px;
+            border-radius: 8px;
+            color: #e0e0e0;
+        }
+        
+        .content-item strong {
+            color: #4caf50;
+            font-size: 1.1rem;
+        }
+        
+        .no-orders {
+            text-align: center;
+            padding: 80px 20px;
+            color: #b0b0b0;
+            background: #2d2d2d;
+            border-radius: 12px;
+            border: 2px solid #444;
+        }
+        
+        .no-orders h3 {
+            color: #e0e0e0;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .no-orders p {
+            color: #b0b0b0;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+        
+        .order-status-section {
+            background: #1a1a1a;
+            border: 2px solid #6c757d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .status-info h4 {
+            margin: 0 0 12px 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #e0e0e0;
+        }
+        
+        .status-info p {
+            color: #b0b0b0;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        
+        .status-info em {
+            color: #888;
+            font-size: 0.95rem;
+        }
+        
+        .status-info strong {
+            color: #e0e0e0;
+            font-weight: 700;
+        }
+        
+        .pending-status {
+            border-color: #ffc107;
+            background: #332a00;
+        }
+        
+        .pending-status h4 {
+            color: #ffc107;
+        }
+        
+        .accepted-status {
+            border-color: #28a745;
+            background: #0d2818;
+        }
+        
+        .accepted-status h4 {
+            color: #4caf50;
+        }
+        
+        .declined-status, .auto-declined-status {
+            border-color: #dc3545;
+            background: #2d0a0a;
+        }
+        
+        .declined-status h4, .auto-declined-status h4 {
+            color: #f56565;
+        }
+        
+        .completed-status {
+            border-color: #007bff;
+            background: #0a1a2d;
+        }
+        
+        .completed-status h4 {
+            color: #66b3ff;
+        }
+        
+        .download-section {
+            background: #332a00;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .download-section h4 {
+            color: #ffc107;
+            margin-top: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .download-section p {
+            color: #e6d576;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+    
+    <main style="background: #1a1a1a; color: #e0e0e0;">
+        <div class="orders-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: #2d2d2d; border-radius: 12px; border: 2px solid #444;">
+                <h2 style="color: #e0e0e0; font-size: 2rem; font-weight: 700; margin: 0;">My Orders</h2>
+                <div style="display: flex; gap: 12px;">
+                    <form method="POST" action="/orders/mark-read" style="display: inline;">
+                        <button type="submit" style="background: linear-gradient(135deg, #6c757d, #5a6268); color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.3s ease;">
+                            ✓ Mark Notifications Read
+                        </button>
+                    </form>
+                    <button onclick="refreshOrders()" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.3s ease;" id="refreshBtn">
+                        🔄 Refresh Orders
+                    </button>
+                </div>
+            </div>
+            
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            
+            <% if (orders && orders.length > 0) { %>
+                <% orders.forEach(order => { %>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <strong>Order #<%= order.id %></strong> - <%= order.product_name %>
+                            </div>
+                            <div>
+                                <span class="status-badge <%= order.status %>"><%= order.status.toUpperCase() %></span>
+                            </div>
+                        </div>
+                        
+                        <div class="order-body">
+                            <div class="order-info">
+                                <div class="info-item">
+                                    <div class="info-label">Vendor</div>
+                                    <div class="info-value"><%= order.vendor_name || order.vendor_displayname %></div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Product Type</div>
+                                    <div class="info-value"><%= order.product_type.charAt(0).toUpperCase() + order.product_type.slice(1) %></div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Quantity</div>
+                                    <div class="info-value"><%= order.quantity %></div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Total Price</div>
+                                    <div class="info-value"><%= order.currency %> <%= order.total_price %></div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Order Date</div>
+                                    <div class="info-value"><%= new Date(order.created_at).toLocaleDateString() %></div>
+                                </div>
+                                
+                                <% if (order.vendor_response_at) { %>
+                                <div class="info-item">
+                                    <div class="info-label">Vendor Response Date</div>
+                                    <div class="info-value"><%= new Date(order.vendor_response_at).toLocaleDateString() %></div>
+                                </div>
+                                <% } %>
+                                
+                                <% if (order.completed_at) { %>
+                                <div class="info-item">
+                                    <div class="info-label">Completed Date</div>
+                                    <div class="info-value"><%= new Date(order.completed_at).toLocaleDateString() %></div>
+                                </div>
+                                <% } %>
+                                
+                                <% if (order.status === 'pending' && order.auto_decline_at) { %>
+                                <div class="info-item">
+                                    <div class="info-label">Auto-Decline Date</div>
+                                    <div class="info-value">
+                                        <%= new Date(order.auto_decline_at).toLocaleDateString() %>
+                                        <% 
+                                            const now = new Date();
+                                            const autoDeclineDate = new Date(order.auto_decline_at);
+                                            const timeLeft = Math.max(0, Math.ceil((autoDeclineDate - now) / (1000 * 60 * 60 * 24)));
+                                        %>
+                                        <% if (timeLeft > 0) { %>
+                                            <br><small style="color: #856404;">(<%= timeLeft %> day(s) left for vendor response)</small>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <% } %>
+                            </div>
+                            
+                            <% if (order.product_description) { %>
+                                <div class="info-item" style="grid-column: 1 / -1; margin-bottom: 15px;">
+                                    <div class="info-label">Product Description</div>
+                                    <div class="info-value"><%= order.product_description %></div>
+                                </div>
+                            <% } %>
+                            
+                            <!-- Order Status Section -->
+                            <div class="order-status-section" style="grid-column: 1 / -1; margin-bottom: 15px;">
+                                <% if (order.status === 'pending') { %>
+                                    <div class="status-info pending-status">
+                                        <h4>⏳ Order Status: Waiting for Vendor Response</h4>
+                                        <p>Your order has been sent to <strong><%= order.vendor_name || order.vendor_displayname %></strong>. They have 7 days to accept or decline your order.</p>
+                                        <% if (order.auto_decline_at) { %>
+                                            <% 
+                                                const now = new Date();
+                                                const autoDeclineDate = new Date(order.auto_decline_at);
+                                                const timeLeft = Math.max(0, Math.ceil((autoDeclineDate - now) / (1000 * 60 * 60 * 24)));
+                                                const hoursLeft = Math.max(0, Math.ceil((autoDeclineDate - now) / (1000 * 60 * 60)));
+                                            %>
+                                            <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 12px; margin-top: 10px;">
+                                                <p style="margin: 0; font-weight: 600; color: #856404;">
+                                                    <strong>⏰ Vendor Response Deadline:</strong>
+                                                </p>
+                                                <p style="margin: 5px 0 0 0; color: #856404;">
+                                                    <% if (timeLeft > 1) { %>
+                                                        <%= timeLeft %> days remaining for vendor to respond
+                                                    <% } else if (timeLeft === 1) { %>
+                                                        Less than 24 hours remaining (<%= hoursLeft %> hours)
+                                                    <% } else { %>
+                                                        Response deadline has passed - order will auto-decline soon
+                                                    <% } %>
+                                                </p>
+                                                <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #6c757d;">
+                                                    Deadline: <%= new Date(order.auto_decline_at).toLocaleDateString() %> at <%= new Date(order.auto_decline_at).toLocaleTimeString() %>
+                                                </p>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                <% } else if (order.status === 'accepted') { %>
+                                    <div class="status-info accepted-status">
+                                        <h4>✅ Order Accepted - Vendor Preparing Order</h4>
+                                        <p><strong><%= order.vendor_name || order.vendor_displayname %></strong> has accepted your order!</p>
+                                        <% if (order.vendor_response) { %>
+                                            <p><strong>Vendor Message:</strong> "<%= order.vendor_response %>"</p>
+                                        <% } %>
+                                        <p><em>Accepted on: <%= new Date(order.vendor_response_at).toLocaleDateString() %></em></p>
+                                        
+                                        <% if (order.product_type === 'physical') { %>
+                                            <% 
+                                                const acceptedDate = new Date(order.vendor_response_at);
+                                                const shippingDeadline = new Date(acceptedDate);
+                                                shippingDeadline.setDate(shippingDeadline.getDate() + 7);
+                                                const now = new Date();
+                                                const shippingDaysLeft = Math.max(0, Math.ceil((shippingDeadline - now) / (1000 * 60 * 60 * 24)));
+                                            %>
+                                            <div style="background: #d4edda; border: 2px solid #28a745; border-radius: 8px; padding: 12px; margin-top: 10px;">
+                                                <p style="margin: 0; font-weight: 600; color: #155724;">
+                                                    <strong>📦 Shipping Status:</strong>
+                                                </p>
+                                                <p style="margin: 5px 0 0 0; color: #155724;">
+                                                    Vendor has <%= shippingDaysLeft %> days to ship your order
+                                                </p>
+                                                <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #6c757d;">
+                                                    Shipping deadline: <%= shippingDeadline.toLocaleDateString() %>
+                                                </p>
+                                                <% if (shippingDaysLeft <= 2) { %>
+                                                    <p style="margin: 5px 0 0 0; color: #dc3545; font-weight: 600;">
+                                                        ⚠️ Shipping deadline approaching!
+                                                    </p>
+                                                <% } %>
+                                            </div>
+                                        <% } else { %>
+                                            <p>The vendor is now preparing your digital order. You'll receive your digital content once they mark it as completed.</p>
+                                        <% } %>
+                                    </div>
+                                <% } else if (order.status === 'shipped') { %>
+                                    <div class="status-info" style="border-color: #17a2b8; background: #d1ecf1;">
+                                        <h4>🚚 Order Shipped</h4>
+                                        <p><strong><%= order.vendor_name || order.vendor_displayname %></strong> has shipped your order!</p>
+                                        <% if (order.delivery_details) { %>
+                                            <p><strong>Tracking Info:</strong> <%= order.delivery_details %></p>
+                                        <% } %>
+                                        <p><em>Shipped on: <%= new Date(order.shipped_at).toLocaleDateString() %></em></p>
+                                        
+                                        <% if (order.buyer_dispute_deadline) { %>
+                                            <% 
+                                                const now = new Date();
+                                                const disputeDeadline = new Date(order.buyer_dispute_deadline);
+                                                const disputeDaysLeft = Math.max(0, Math.ceil((disputeDeadline - now) / (1000 * 60 * 60 * 24)));
+                                            %>
+                                            <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 12px; margin-top: 10px;">
+                                                <p style="margin: 0; font-weight: 600; color: #856404;">
+                                                    <strong>📋 Action Required:</strong>
+                                                </p>
+                                                <p style="margin: 5px 0 0 0; color: #856404;">
+                                                    You have <%= disputeDaysLeft %> days to either mark as received or open a dispute
+                                                </p>
+                                                <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #6c757d;">
+                                                    Deadline: <%= disputeDeadline.toLocaleDateString() %>
+                                                </p>
+                                                <% if (disputeDaysLeft <= 3) { %>
+                                                    <p style="margin: 5px 0 0 0; color: #dc3545; font-weight: 600;">
+                                                        ⚠️ Response deadline approaching! Order will auto-complete if no action taken.
+                                                    </p>
+                                                <% } %>
+                                            </div>
+                                        <% } %>
+                                        
+                                        <div class="order-actions" style="margin-top: 15px;">
+                                            <form method="POST" action="/orders/<%= order.id %>/received" style="display: inline;">
+                                                <button type="submit" class="btn btn-success" style="margin-right: 10px;">✅ Mark as Received</button>
+                                            </form>
+                                            <button onclick="showDisputeModal(<%= order.id %>)" class="btn btn-warning">⚠️ Open Dispute</button>
+                                        </div>
+                                    </div>
+                                <% } else if (order.status === 'declined') { %>
+                                    <div class="status-info declined-status">
+                                        <h4>❌ Order Declined</h4>
+                                        <p><strong><%= order.vendor_name || order.vendor_displayname %></strong> has declined your order.</p>
+                                        <% if (order.vendor_response) { %>
+                                            <p><strong>Reason:</strong> "<%= order.vendor_response %>"</p>
+                                        <% } %>
+                                        <p><em>Declined on: <%= new Date(order.vendor_response_at).toLocaleDateString() %></em></p>
+                                        <p style="color: #28a745;"><strong>A refund will be processed automatically.</strong></p>
+                                    </div>
+                                <% } else if (order.status === 'auto_declined') { %>
+                                    <div class="status-info auto-declined-status">
+                                        <h4>⏰ Order Auto-Declined</h4>
+                                        <p>This order was automatically declined because the vendor did not respond within 7 days.</p>
+                                        <p style="color: #28a745;"><strong>A refund has been processed automatically.</strong></p>
+                                    </div>
+                                <% } else if (order.status === 'completed') { %>
+                                    <div class="status-info completed-status">
+                                        <h4>🎉 Order Completed</h4>
+                                        <p>Your order has been completed by <strong><%= order.vendor_name || order.vendor_displayname %></strong>!</p>
+                                        <p><em>Completed on: <%= new Date(order.completed_at).toLocaleDateString() %></em></p>
+                                        
+                                        <div style="background: #d4edda; border: 2px solid #28a745; border-radius: 8px; padding: 12px; margin-top: 10px;">
+                                            <p style="margin: 0; font-weight: 600; color: #155724;">
+                                                <strong>✅ Transaction Complete:</strong>
+                                            </p>
+                                            <p style="margin: 5px 0 0 0; color: #155724;">
+                                                This order has been completed and disputes can no longer be opened.
+                                            </p>
+                                        </div>
+                                    </div>
+                                <% } else if (order.status === 'received') { %>
+                                    <div class="status-info" style="border-color: #17a2b8; background: #d1ecf1;">
+                                        <h4>✅ Order Received</h4>
+                                        <p>You've confirmed receipt of this order. Thank you for your purchase!</p>
+                                        <p><em>Received on: <%= new Date(order.received_at).toLocaleDateString() %></em></p>
+                                        <div style="background: #d4edda; border: 2px solid #28a745; border-radius: 8px; padding: 12px; margin-top: 10px;">
+                                            <p style="margin: 0; font-weight: 600; color: #155724;">
+                                                <strong>✅ Order Complete:</strong>
+                                            </p>
+                                            <p style="margin: 5px 0 0 0; color: #155724;">
+                                                Since you've marked this order as received, the transaction is now complete and disputes can no longer be opened.
+                                            </p>
+                                        </div>
+                                        <% if (!order.feedback_given) { %>
+                                            <div style="margin-top: 15px;">
+                                                <a href="/orders/<%= order.id %>/feedback" class="btn btn-primary">⭐ Leave Vendor Feedback</a>
+                                            </div>
+                                        <% } else { %>
+                                            <p style="color: #28a745; margin-top: 15px;"><strong>✅ Feedback submitted</strong></p>
+                                        <% } %>
+                                    </div>
+                                <% } else if (order.status === 'disputed') { %>
+                                    <div class="status-info" style="border-left-color: #ffc107; background: #fff3cd;">
+                                        <h4>⚠️ Order Under Dispute</h4>
+                                        <p>This order is currently under review by our admin team.</p>
+                                        <p><em>Disputed on: <%= new Date(order.disputed_at).toLocaleDateString() %></em></p>
+                                        <% if (order.dispute_reason) { %>
+                                            <p><strong>Reason:</strong> <%= order.dispute_reason %></p>
+                                        <% } %>
+                                    </div>
+                                <% } %>
+                            </div>
+                            
+                            <% if (order.product_type === 'digital' && order.content_type && order.status === 'completed') { %>
+                                <div class="digital-content">
+                                    <h4>🎉 Your Digital Purchase</h4>
+                                    
+                                    <% if (order.content_type === 'download_link') { %>
+                                        <div class="download-section">
+                                            <h4>Download Information</h4>
+                                            <div class="content-details">
+                                                <div class="content-item">
+                                                    <strong>Download URL:</strong><br>
+                                                    <a href="<%= order.download_url %>" target="_blank" style="word-break: break-all;"><%= order.download_url %></a>
+                                                    <button class="copy-btn" onclick="copyToClipboard('<%= order.download_url %>')">Copy URL</button>
+                                                </div>
+                                                <div class="content-item">
+                                                    <strong>Password:</strong><br>
+                                                    <span id="pass-<%= order.id %>"><%= order.download_password %></span>
+                                                    <button class="copy-btn" onclick="copyToClipboard('<%= order.download_password %>')">Copy Password</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% } else if (order.content_type === 'account_info') { %>
+                                        <div class="content-details">
+                                            <div class="content-item">
+                                                <strong>Username/Login:</strong><br>
+                                                <span><%= order.account_username %></span>
+                                                <button class="copy-btn" onclick="copyToClipboard('<%= order.account_username %>')">Copy</button>
+                                            </div>
+                                            <div class="content-item">
+                                                <strong>Password:</strong><br>
+                                                <span><%= order.account_password %></span>
+                                                <button class="copy-btn" onclick="copyToClipboard('<%= order.account_password %>')">Copy</button>
+                                            </div>
+                                            <% if (order.account_email) { %>
+                                            <div class="content-item">
+                                                <strong>Email:</strong><br>
+                                                <span><%= order.account_email %></span>
+                                                <button class="copy-btn" onclick="copyToClipboard('<%= order.account_email %>')">Copy</button>
+                                            </div>
+                                            <% } %>
+                                        </div>
+                                    <% } else if (order.content_type === 'text_content') { %>
+                                        <div class="content-details">
+                                            <div class="content-item" style="grid-column: 1 / -1;">
+                                                <strong>Digital Content:</strong><br>
+                                                <pre style="white-space: pre-wrap; background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 5px;"><%= order.additional_info %></pre>
+                                                <button class="copy-btn" onclick="copyToClipboard('<%= order.additional_info %>')">Copy Content</button>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <% if (order.instructions) { %>
+                                        <div class="content-item" style="margin-top: 15px;">
+                                            <strong>📋 Instructions:</strong><br>
+                                            <div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 5px;">
+                                                <%= order.instructions %>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% } else if (order.product_type === 'digital' && order.status !== 'completed') { %>
+                                <div class="download-section">
+                                    <h4>⏳ Digital Content Pending</h4>
+                                    <p>Your digital content will be available once the order is processed and completed.</p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="no-orders">
+                    <h3>No Orders Yet</h3>
+                    <p>You haven't made any purchases yet. Start shopping to see your orders here!</p>
+                    <a href="/" class="btn btn-primary">Browse Products</a>
+                </div>
+            <% } %>
+        </div>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <!-- Dispute Modal -->
+    <div id="disputeModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);">
+        <div class="modal-content" style="background: #2d2d2d; margin: 5% auto; padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; border: 2px solid #444;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="color: #e0e0e0; margin: 0; font-size: 1.5rem;">Open Dispute</h3>
+                <span class="close" onclick="closeDisputeModal()" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            </div>
+            
+            <form id="disputeForm" method="POST">
+                <div style="margin-bottom: 20px;">
+                    <label for="dispute_reason" style="display: block; color: #e0e0e0; font-weight: 600; margin-bottom: 8px;">Reason for Dispute:</label>
+                    <select id="dispute_reason" name="dispute_reason" required style="width: 100%; padding: 12px; background: #1a1a1a; border: 2px solid #444; color: #e0e0e0; border-radius: 8px; font-size: 1rem;">
+                        <option value="">Select a reason...</option>
+                        <option value="item_not_received">Item not received</option>
+                        <option value="item_not_as_described">Item not as described</option>
+                        <option value="damaged_item">Item damaged/defective</option>
+                        <option value="wrong_item">Wrong item received</option>
+                        <option value="digital_content_invalid">Digital content invalid/doesn't work</option>
+                        <option value="vendor_unresponsive">Vendor unresponsive</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="dispute_details" style="display: block; color: #e0e0e0; font-weight: 600; margin-bottom: 8px;">Additional Details:</label>
+                    <textarea id="dispute_details" name="dispute_details" rows="4" placeholder="Please provide detailed information about the issue..." style="width: 100%; padding: 12px; background: #1a1a1a; border: 2px solid #444; color: #e0e0e0; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
+                </div>
+                
+                <div style="background: #332a00; border: 2px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                    <p style="color: #ffc107; margin: 0; font-weight: 600;">⚠️ Important:</p>
+                    <p style="color: #e6d576; margin: 5px 0 0 0; font-size: 0.9rem;">
+                        Opening a dispute will pause all timers and send this case to our admin team for review. 
+                        Please provide as much detail as possible to help us resolve this quickly.
+                    </p>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                    <button type="button" onclick="closeDisputeModal()" style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">Cancel</button>
+                    <button type="submit" style="background: #dc3545; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">Open Dispute</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show feedback
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#007bff';
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        function refreshOrders() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const originalText = refreshBtn.textContent;
+            
+            // Show loading state
+            refreshBtn.textContent = '🔄 Refreshing...';
+            refreshBtn.disabled = true;
+            refreshBtn.style.opacity = '0.7';
+            
+            // Reload the page to get fresh order data
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        }
+
+        function showDisputeModal(orderId) {
+            document.getElementById('disputeModal').style.display = 'block';
+            document.getElementById('disputeForm').action = `/orders/${orderId}/dispute`;
+        }
+
+        function closeDisputeModal() {
+            document.getElementById('disputeModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('disputeModal');
+            if (event.target == modal) {
+                closeDisputeModal();
+            }
+        }
+    </script>
+</body>
+</html>

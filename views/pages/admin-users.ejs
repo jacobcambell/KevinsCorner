@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Management - Kevin's Corner Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Kevin's Corner - User Management</h1>
+        <div style="float: right;">
+            Welcome, <%= user.displayname %>! 
+            <form method="POST" action="/auth/logout" style="display: inline;">
+                <button type="submit" style="background: none; border: none; color: white; cursor: pointer; text-decoration: underline;">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <main>
+        <div class="admin-panel">
+            <div class="admin-nav">
+                <nav>
+                    <ul>
+                        <li><a href="/admin/dashboard">← Back to Dashboard</a></li>
+                        <li><a href="/">← Back to Home</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+
+            <h2>All Registered Users</h2>
+            
+            <% if (users.length > 0) { %>
+                <div class="search-container" style="margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label for="userSearch">Search Users:</label>
+                        <input type="text" id="userSearch" placeholder="Search by username, display name, or ID..." 
+                               style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                    <p id="searchResults" style="color: #666; font-size: 0.9rem; margin-top: 5px;"></p>
+                </div>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Display Name</th>
+                                <th>Status</th>
+                                <th>Ban Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(u => { %>
+                                <tr>
+                                    <td><%= u.id %></td>
+                                    <td><%= u.username %></td>
+                                    <td><%= u.displayname %></td>
+                                    <td>
+                                        <span class="status-badge <%= u.is_vendor === 1 ? 'vendor' : 'user' %>">
+                                            <%= u.is_vendor === 1 ? 'Vendor' : 'User' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <% if (u.is_banned === 1) { %>
+                                            <span class="status-badge banned">Banned</span>
+                                            <% if (u.ban_reason) { %>
+                                                <div class="ban-reason">Reason: <%= u.ban_reason %></div>
+                                            <% } %>
+                                        <% } else { %>
+                                            <span class="status-badge active">Active</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= new Date(u.created_at).toLocaleDateString() %></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <% if (u.username !== 'admin') { %>
+                                                <% if (u.is_banned === 1) { %>
+                                                    <form method="POST" action="/admin/unban-user/<%= u.id %>" style="display: inline;">
+                                                        <button type="submit" class="btn-small btn-success">Unban</button>
+                                                    </form>
+                                                <% } else { %>
+                                                    <button class="btn-small btn-danger ban-btn" 
+                                                            onclick="showBanModal(<%= u.id %>, '<%= u.username %>')">Ban User</button>
+                                                <% } %>
+                                                <% if (u.is_vendor === 1) { %>
+                                                    <form method="POST" action="/admin/remove-vendor/<%= u.id %>" style="display: inline;">
+                                                        <button type="submit" class="btn-small btn-warning" 
+                                                                onclick="return confirm('Are you sure you want to remove vendor status from <%= u.username %>?')">Remove Vendor</button>
+                                                    </form>
+                                                <% } else { %>
+                                                    <form method="POST" action="/admin/make-vendor/<%= u.id %>" style="display: inline;">
+                                                        <button type="submit" class="btn-small btn-info"
+                                                                onclick="return confirm('Are you sure you want to make <%= u.username %> a vendor?')">Make Vendor</button>
+                                                    </form>
+                                                <% } %>
+                                            <% } else { %>
+                                                <span class="admin-label">Admin</span>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <p>No users found.</p>
+            <% } %>
+        </div>
+    </main>
+
+    <!-- Ban User Modal -->
+    <div id="banModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeBanModal()">&times;</span>
+            <h3>Ban User</h3>
+            <form id="banForm" method="POST">
+                <div class="form-group">
+                    <label for="ban_reason">Reason for ban:</label>
+                    <textarea id="ban_reason" name="ban_reason" rows="4" 
+                              placeholder="Enter reason for banning this user..." required></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-danger">Ban User</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeBanModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showBanModal(userId, username) {
+            document.getElementById('banModal').style.display = 'block';
+            document.getElementById('banForm').action = '/admin/ban-user/' + userId;
+            document.querySelector('#banModal h3').textContent = 'Ban User: ' + username;
+        }
+
+        function closeBanModal() {
+            document.getElementById('banModal').style.display = 'none';
+            document.getElementById('ban_reason').value = '';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('banModal');
+            if (event.target == modal) {
+                closeBanModal();
+            }
+        }
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('userSearch');
+            const table = document.querySelector('.admin-table tbody');
+            const rows = table.getElementsByTagName('tr');
+            const searchResults = document.getElementById('searchResults');
+            const totalUsers = rows.length;
+
+            function updateSearchResults(visibleCount) {
+                if (searchInput.value.trim() === '') {
+                    searchResults.textContent = `Showing all ${totalUsers} users`;
+                } else {
+                    searchResults.textContent = `Showing ${visibleCount} of ${totalUsers} users`;
+                }
+            }
+
+            // Initial count
+            updateSearchResults(totalUsers);
+
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toLowerCase();
+                let visibleCount = 0;
+
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    const id = row.cells[0].textContent.toLowerCase();
+                    const username = row.cells[1].textContent.toLowerCase();
+                    const displayName = row.cells[2].textContent.toLowerCase();
+
+                    if (id.includes(filter) || username.includes(filter) || displayName.includes(filter)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+
+                updateSearchResults(visibleCount);
+            });
+        });
+    </script>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

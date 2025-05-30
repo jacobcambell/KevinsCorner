@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Center - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <main>
+        <div class="message-center-container">
+            <!-- Header Section -->
+            <div class="message-center-header">
+                <h1>📧 Message Center</h1>
+                <div class="inbox-stats">
+                    <div class="stat-item">
+                        <span class="stat-icon">📥</span>
+                        <span>Total: <%= threads ? threads.length : 0 %></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">🔴</span>
+                        <span>Unread: <%= threads ? threads.filter(t => t.unread_count > 0).length : 0 %></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">👤</span>
+                        <span><%= user.displayname %></span>
+                    </div>
+                </div>
+            </div>
+
+            <% if (error) { %>
+                <div class="error" style="margin: 20px 30px;">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <% if (success) { %>
+                <div class="success" style="margin: 20px 30px;">
+                    <%= success %>
+                </div>
+            <% } %>
+
+            <!-- Inbox Section -->
+            <div class="conversations-section">
+                <div class="inbox-header">
+                    <h3 class="inbox-title">
+                        <span class="inbox-icon">📬</span>
+                        Your Inbox
+                    </h3>
+                </div>
+
+                <% if (threads && threads.length > 0) { %>
+                    <div class="threads-list">
+                        <% threads.forEach(thread => { %>
+                            <div class="thread-item <%= thread.unread_count > 0 ? 'unread' : '' %>">
+                                <a href="/messages/thread/<%= thread.id %>" class="thread-link">
+                                    <div class="thread-header">
+                                        <div class="thread-left">
+                                            <div class="thread-avatar">
+                                                <%= thread.other_participant.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div class="thread-info">
+                                                <div class="participant-name">
+                                                    <%= thread.other_participant %>
+                                                </div>
+                                                <div class="thread-subject">
+                                                    Conversation Thread
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="thread-right">
+                                            <% if (thread.unread_count > 0) { %>
+                                                <span class="unread-badge"><%= thread.unread_count %></span>
+                                            <% } %>
+                                            <span class="thread-date">
+                                                <%= new Date(thread.last_message_at).toLocaleDateString('en-US', { 
+                                                    month: 'short', 
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                }) %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="last-message">
+                                        <%= thread.last_message ? (thread.last_message.length > 120 ? thread.last_message.substring(0, 120) + '...' : thread.last_message) : 'No messages yet - start the conversation!' %>
+                                    </div>
+                                </a>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-inbox">
+                        <div class="empty-inbox-icon">📭</div>
+                        <h3>Your inbox is empty</h3>
+                        <p>Start a new conversation by composing a message above!</p>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Compose New Message Section -->
+            <div class="compose-section">
+                <div class="compose-header">
+                    <span class="compose-icon">✏️</span>
+                    <h3>Compose New Message</h3>
+                </div>
+                <div class="compose-form">
+                    <form method="POST" action="/messages/new" id="composeForm">
+                        <div class="form-group">
+                            <label for="recipient_displayname">📤 To (Display Name):</label>
+                            <input type="text" id="recipient_displayname" name="recipient_displayname" placeholder="Enter recipient's display name..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message_content">💬 Message:</label>
+                            <textarea id="message_content" name="message_content" rows="4" placeholder="Type your message here..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="compose_pin">🔐 Your PIN:</label>
+                            <input type="password" id="compose_pin" name="pin" placeholder="Enter your PIN to send message..." required autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="btn-send">
+                            <span>📨</span>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        // Progressive enhancement - clear form fields after successful message send
+        // This will only work if JavaScript is enabled, but the form works without it
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'message_sent') {
+                // Clear the compose form
+                const recipientField = document.getElementById('recipient_displayname');
+                const messageField = document.getElementById('message_content');
+                const pinField = document.getElementById('compose_pin');
+
+                if (recipientField) recipientField.value = '';
+                if (messageField) messageField.value = '';
+                if (pinField) pinField.value = '';
+
+                // Remove success parameter from URL without page reload
+                const newUrl = window.location.pathname;
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState({}, document.title, newUrl);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forums - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .forums-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .forum-category {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .category-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .category-header p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .category-stats {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .latest-thread {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .latest-thread h4 {
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .latest-thread-meta {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .enter-forum-btn {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .enter-forum-btn:hover {
+            background: #0056b3;
+            color: white;
+            text-decoration: none;
+        }
+
+        .no-categories {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <main>
+        <div class="forums-container">
+            <div class="form-container">
+                <h2>Community Forums</h2>
+
+
+
+                <!-- Banner Area -->
+                <% if (banners && banners.length > 0) { %>
+                    <div class="banner-area">
+                        <% banners.forEach(banner => { %>
+                            <% 
+                            let imageSrc = '';
+                            if (banner.image_data) {
+                                if (banner.image_data.startsWith('data:')) {
+                                    imageSrc = banner.image_data;
+                                } else {
+                                    imageSrc = `data:image/jpeg;base64,${banner.image_data}`;
+                                }
+                            }
+                            %>
+
+                            <% if (banner.link_url) { %>
+                                <a href="<%= banner.link_url %>" class="banner-link-horizontal" target="_blank">
+                            <% } %>
+
+                            <% if (imageSrc) { %>
+                                <img src="<%= imageSrc %>" alt="<%= banner.title %>" class="forum-banner-horizontal" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="forum-banner-placeholder-horizontal" style="display: none;">
+                                    <%= banner.title %>
+                                </div>
+                            <% } else { %>
+                                <div class="forum-banner-placeholder-horizontal" style="display: flex;">
+                                    <%= banner.title %>
+                                </div>
+                            <% } %>
+
+                            <% if (banner.link_url) { %>
+                                </a>
+                            <% } %>
+                        <% }) %>
+                    </div>
+                <% } %>
+
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+
+            <% if (categories && categories.length > 0) { %>
+                <% categories.forEach(category => { %>
+                    <div class="forum-category">
+                        <div class="category-header">
+                            <h3><%= category.name %></h3>
+                            <% if (category.description) { %>
+                                <p><%= category.description %></p>
+                            <% } %>
+                        </div>
+
+                        <div class="category-stats">
+                            <div class="stat-item">
+                                <div class="stat-number"><%= category.thread_count || 0 %></div>
+                                <div class="stat-label">Threads</div>
+                            </div>
+
+                            <div class="latest-thread">
+                                <% if (category.latest_thread) { %>
+                                    <h4>Latest: <%= category.latest_thread.title %></h4>
+                                    <div class="latest-thread-meta">
+                                        by <%= category.latest_thread.created_by_displayname %> • 
+                                        <%= new Date(category.latest_thread.created_at).toLocaleDateString() %>
+                                    </div>
+                                <% } else { %>
+                                    <h4>No threads yet</h4>
+                                    <div class="latest-thread-meta">Be the first to start a discussion!</div>
+                                <% } %>
+                            </div>
+
+                            <a href="/forums/category/<%= category.id %>" class="enter-forum-btn">
+                                Enter Forum
+                            </a>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-categories">
+                    <h3>No forum categories available</h3>
+                    <p>Check back later for community discussions!</p>
+                </div>
+            <% } %>
+
+            <!-- Website Directory Search Section -->
+            <div class="website-directory-section">
+                <h3>🌐 Website Directory</h3>
+
+                <!-- Server-side search form (works without JavaScript) -->
+                <form action="/forums" method="GET" class="search-container">
+                    <input type="text" name="websiteSearch" class="search-input" 
+                           placeholder="Search websites by keywords or title..." 
+                           value="<%= typeof websiteSearch !== 'undefined' ? websiteSearch : '' %>">
+                    <button type="submit" class="search-btn">Search</button>
+                    <% if (typeof websiteSearch !== 'undefined' && websiteSearch) { %>
+                        <a href="/forums" class="clear-btn" style="text-decoration: none; display: inline-block; text-align: center;">Clear</a>
+                    <% } %>
+                    <button type="button" onclick="showAddWebsiteForm()" class="add-btn" style="margin-left: 10px;">+ Add Website</button>
+                </form>
+
+                <!-- JavaScript-enhanced search (hidden input for JS users) -->
+                <div class="js-search-container" style="display: none;">
+                    <input type="text" id="websiteSearchInput" class="search-input" placeholder="Search websites by keywords or title...">
+                    <button onclick="searchWebsites()" class="search-btn">Search</button>
+                    <button onclick="clearWebsiteSearch()" class="clear-btn">Clear</button>
+                    <button onclick="showAddWebsiteForm()" class="add-btn" style="margin-left: 10px;">+ Add Website</button>
+                </div>
+
+                <!-- Add Website Form (initially hidden) -->
+                <div id="addWebsiteForm" class="add-website-form" style="display: none;">
+                    <h4>Add New Website</h4>
+                    <div class="form-group">
+                        <label>Website Title:</label>
+                        <input type="text" id="addWebsiteTitle" placeholder="e.g., Google">
+                    </div>
+                    <div class="form-group">
+                        <label>Website URL:</label>
+                        <input type="url" id="addWebsiteUrl" placeholder="https://google.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Keywords (comma-separated):</label>
+                        <input type="text" id="addWebsiteKeywords" placeholder="search engine, google, web search">
+                    </div>
+                    <div class="form-group">
+                        <label>Description (optional):</label>
+                        <textarea id="addWebsiteDescription" rows="3" placeholder="Brief description of the website"></textarea>
+                    </div>
+                    <div class="form-buttons">
+                        <button onclick="submitWebsite()" class="submit-btn">Add Website</button>
+                        <button onclick="hideAddWebsiteForm()" class="cancel-btn">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Server-side search results -->
+                <% if (typeof websites !== 'undefined' && websites.length > 0) { %>
+                    <div class="search-results">
+                        <h4>Search Results (<%= websites.length %> found)</h4>
+                        <div class="website-results-grid">
+                            <% websites.forEach(website => { %>
+                                <div class="website-result-item">
+                                    <div class="website-info">
+                                        <h5>
+                                            <a href="<%= website.url %>" target="_blank" rel="noopener noreferrer">
+                                                <%= website.title %>
+                                            </a>
+                                        </h5>
+                                        <div class="website-url"><%= website.url %></div>
+                                        <% if (website.description) { %>
+                                            <div class="website-description"><%= website.description %></div>
+                                        <% } %>
+                                        <div class="website-keywords">Keywords: <%= website.keywords %></div>
+                                        <div class="website-added">Added: <%= new Date(website.created_at).toLocaleDateString() %></div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } else if (typeof websiteSearch !== 'undefined' && websiteSearch) { %>
+                    <div class="search-results">
+                        <p>No websites found matching "<%= websiteSearch %>"</p>
+                    </div>
+                <% } %>
+
+                <div id="websiteResults" class="search-results">
+                    <!-- JavaScript search results will appear here -->
+                </div>
+            </div>
+
+            <div class="links">
+                <a href="/">← Back to Home</a>
+            </div>
+        </div>
+    </main>
+
+
+
+    <script>
+            let searchTimeout;
+            let currentUser = <%= user ? JSON.stringify({id: user.id, username: user.username, displayname: user.displayname}) : 'null' %>;
+
+            // Load banners on page load and setup progressive enhancement
+            document.addEventListener('DOMContentLoaded', function() {
+                loadBanners();
+
+                // Progressive enhancement: hide server form, show JS form
+                const serverForm = document.querySelector('.search-container form');
+                const jsContainer = document.querySelector('.js-search-container');
+                if (serverForm && jsContainer) {
+                    serverForm.style.display = 'none';
+                    jsContainer.style.display = 'flex';
+                }
+            });
+
+        let allBanners = [];
+
+        // Load all banners on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/forums/api/forum-banners')
+                .then(response => response.json())
+                .then(banners => {
+                    allBanners = banners;
+                })
+                .catch(error => {
+                    console.error('Error loading banners for search:', error);
+                });
+        });
+
+        function searchBanners() {
+            const searchTerm = document.getElementById('bannerSearch').value.toLowerCase().trim();
+            const resultsContainer = document.getElementById('searchResults');
+
+            if (!searchTerm) {
+                resultsContainer.innerHTML = '<p class="no-results">Please enter a search term</p>';
+                return;
+            }
+
+            const matchingBanners = allBanners.filter(banner => {
+                const keywords = (banner.keywords || '').toLowerCase();
+                const title = (banner.title || '').toLowerCase();
+                const linkUrl = (banner.link_url || '').toLowerCase();
+
+                return keywords.includes(searchTerm) || 
+                       title.includes(searchTerm) || 
+                       linkUrl.includes(searchTerm);
+            });
+
+            if (matchingBanners.length === 0) {
+                resultsContainer.innerHTML = '<p class="no-results">No banners found matching your search</p>';
+                return;
+            }
+
+            let resultsHTML = '<h4>Search Results:</h4><div class="search-banner-grid">';
+
+            matchingBanners.forEach(banner => {
+                let imageSrc = '';
+                if (banner.image_data) {
+                    if (banner.image_data.startsWith('data:')) {
+                        imageSrc = banner.image_data;
+                    } else {
+                        imageSrc = `data:image/jpeg;base64,${banner.image_data}`;
+                    }
+                }
+
+                const bannerHTML = `
+                    <div class="search-banner-item">
+                        ${banner.link_url ? `<a href="${banner.link_url}" target="_blank" class="search-banner-link">` : ''}
+                        ${imageSrc ? 
+                            `<img src="${imageSrc}" alt="${banner.title}" class="search-banner-img" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                             <div class="search-banner-placeholder" style="display: none;">
+                                 ${banner.title}
+                             </div>` :
+                            `<div class="search-banner-placeholder" style="display: flex;">
+                                 ${banner.title}
+                             </div>`
+                        }
+                        ${banner.link_url ? '</a>' : ''}
+                        <div class="search-banner-info">
+                            <strong>${banner.title}</strong>
+                            ${banner.link_url ? `<br><small>URL: ${banner.link_url}</small>` : ''}
+                            ${banner.keywords ? `<br><small>Keywords: ${banner.keywords}</small>` : ''}
+                        </div>
+                    </div>
+                `;
+                resultsHTML += bannerHTML;
+            });
+
+            resultsHTML += '</div>';
+            resultsContainer.innerHTML = resultsHTML;
+        }
+
+        function clearSearch() {
+            document.getElementById('bannerSearch').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+        }
+
+        // Allow search on Enter key press
+        document.getElementById('bannerSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchBanners();
+            }
+        });
+
+        // Website directory functions
+        function searchWebsites() {
+            const searchTerm = document.getElementById('websiteSearchInput').value.toLowerCase().trim();
+            const resultsContainer = document.getElementById('websiteResults');
+
+            if (!searchTerm) {
+                resultsContainer.innerHTML = '<p class="no-results">Please enter a search term</p>';
+                return;
+            }
+
+            fetch(`/forums/api/website-search?q=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(websites => {
+                    if (websites.length === 0) {
+                        resultsContainer.innerHTML = '<p class="no-results">No websites found matching your search</p>';
+                        return;
+                    }
+
+                    let resultsHTML = '<h4>Website Search Results:</h4><div class="website-results-grid">';
+
+                    websites.forEach(website => {
+                        const websiteHTML = `
+                            <div class="website-result-item">
+                                <div class="website-info">
+                                    <h5><a href="${website.url}" target="_blank" rel="noopener noreferrer">${website.title}</a></h5>
+                                    <p class="website-url">${website.url}</p>
+                                    ${website.description ? `<p class="website-description">${website.description}</p>` : ''}
+                                    <p class="website-keywords"><strong>Keywords:</strong> ${website.keywords}</p>
+                                    <p class="website-added">Added: ${new Date(website.created_at).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                        `;
+                        resultsHTML += websiteHTML;
+                    });
+
+                    resultsHTML += '</div>';
+                    resultsContainer.innerHTML = resultsHTML;
+                })
+                .catch(error => {
+                    console.error('Error searching websites:', error);
+                    resultsContainer.innerHTML = '<p class="no-results">Search failed. Please try again.</p>';
+                });
+        }
+
+        function clearWebsiteSearch() {
+            document.getElementById('websiteSearchInput').value = '';
+            document.getElementById('websiteResults').innerHTML = '';
+        }
+
+        // Allow search on Enter key press for website search
+        document.getElementById('websiteSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchWebsites();
+            }
+        });
+    </script>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

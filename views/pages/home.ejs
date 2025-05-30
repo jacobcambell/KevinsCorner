@@ -3,15 +3,554 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>Kevin's Corner - Marketplace</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .products-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #333;
+            margin: 0;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 140px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 0.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #f8f9fa;
+        }
+
+        .product-type-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge-physical {
+            background: rgba(25, 118, 210, 0.9);
+        }
+
+        .badge-digital {
+            background: rgba(123, 31, 162, 0.9);
+        }
+
+        .product-content {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 8px;
+        }
+
+        .product-description {
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.3;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-vendor {
+            font-size: 0.75rem;
+            color: #999;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-view {
+            flex: 1;
+            padding: 6px 12px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background: #0056b3;
+            color: white;
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .no-products-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .error, .success {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <%- include('../partials/header') %>
+    <%- include('../partials/header', { user: user }) %>
 
     <main>
-        <h1>Welcome to our Node.js EJS SQLite App!</h1>
-        <p>This is the home page.</p>
+        <div class="hero-section">
+            <div class="hero-title">Kevin's Corner</div>
+            <div class="hero-subtitle">Your trusted marketplace for digital and physical goods</div>
+        </div>
+
+        <div class="products-section">
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <% if (typeof success !== 'undefined' && success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+
+            <div class="section-header">
+                <h2 class="section-title">Latest Products</h2>
+                <% if (user && typeof user.isVendor !== 'undefined' && !user.isVendor) { %>
+                    <a href="/vendor/apply" class="btn btn-primary">Become a Vendor</a>
+                <% } else if (user && typeof user.isVendor !== 'undefined' && user.isVendor) { %>
+                    <a href="/vendor/dashboard" class="btn btn-primary">Vendor Dashboard</a>
+                <% } %>
+            </div>
+
+            <div class="categories-section">
+
+<div class="categories-sidebar">
+                    <h3>📦 Categories</h3>
+                    <div class="categories-grid">
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="all" class="category-item <%= selectedCategory === 'all' ? 'active' : '' %>">
+                                All Categories
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="electronics" class="category-item <%= selectedCategory === 'electronics' ? 'active' : '' %>">
+                                Electronics
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="clothing" class="category-item <%= selectedCategory === 'clothing' ? 'active' : '' %>">
+                                Clothing
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="books" class="category-item <%= selectedCategory === 'books' ? 'active' : '' %>">
+                                Books
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="home" class="category-item <%= selectedCategory === 'home' ? 'active' : '' %>">
+                                Home & Garden
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="sports" class="category-item <%= selectedCategory === 'sports' ? 'active' : '' %>">
+                                Sports
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="toys" class="category-item <%= selectedCategory === 'toys' ? 'active' : '' %>">
+                                Toys & Games
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="automotive" class="category-item <%= selectedCategory === 'automotive' ? 'active' : '' %>">
+                                Automotive
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="health" class="category-item <%= selectedCategory === 'health' ? 'active' : '' %>">
+                                Health & Beauty
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="music" class="category-item <%= selectedCategory === 'music' ? 'active' : '' %>">
+                                Music & Audio
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                            <button type="submit" name="category" value="other" class="category-item <%= selectedCategory === 'other' ? 'active' : '' %>">
+                                Other
+                            </button>
+                        </form>
+                    </div>
+
+                    <h3 style="margin-top: 25px;">💰 Price Range</h3>
+                    <div class="price-range-grid">
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="category" value="<%= selectedCategory %>">
+                            <button type="submit" name="priceRange" value="all" class="price-range-item <%= !selectedPriceRange || selectedPriceRange === 'all' ? 'active' : '' %>">
+                                All Prices
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="category" value="<%= selectedCategory %>">
+                            <button type="submit" name="priceRange" value="0-25" class="price-range-item <%= selectedPriceRange === '0-25' ? 'active' : '' %>">
+                                Under $25
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="category" value="<%= selectedCategory %>">
+                            <button type="submit" name="priceRange" value="25-50" class="price-range-item <%= selectedPriceRange === '25-50' ? 'active' : '' %>">
+                                $25 - $50
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="category" value="<%= selectedCategory %>">
+                            <button type="submit" name="priceRange" value="50-100" class="price-range-item <%= selectedPriceRange === '50-100' ? 'active' : '' %>">
+                                $50 - $100
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="category" value="<%= selectedCategory %>">
+                            <button type="submit" name="priceRange" value="100-250" class="price-range-item <%= selectedPriceRange === '100-250' ? 'active' : '' %>">
+                                $100 - $250
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="category" value="<%= selectedCategory %>">
+                            <button type="submit" name="priceRange" value="250-500" class="price-range-item <%= selectedPriceRange === '250-500' ? 'active' : '' %>">
+                                $250 - $500
+                            </button>
+                        </form>
+                        <form method="GET" action="/" style="margin: 0;">
+                            <input type="hidden" name="type" value="<%= selectedType %>">
+                            <input type="hidden" name="category" value="<%= selectedCategory %>">
+                            <button type="submit" name="priceRange" value="500+" class="price-range-item <%= selectedPriceRange === '500+' ? 'active' : '' %>">
+                                $500+
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="content-area">
+
+<div class="product-type-filters">
+                    <form method="GET" action="/" style="margin: 0;">
+                        <input type="hidden" name="category" value="<%= selectedCategory %>">
+                        <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                        <button type="submit" name="type" value="all" class="filter-btn <%= selectedType === 'all' ? 'active' : '' %>">
+                            All Items
+                        </button>
+                    </form>
+                    <form method="GET" action="/" style="margin: 0;">
+                        <input type="hidden" name="category" value="<%= selectedCategory %>">
+                        <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                        <button type="submit" name="type" value="physical" class="filter-btn <%= selectedType === 'physical' ? 'active' : '' %>">
+                            📦 Physical
+                        </button>
+                    </form>
+                    <form method="GET" action="/" style="margin: 0;">
+                        <input type="hidden" name="category" value="<%= selectedCategory %>">
+                        <input type="hidden" name="priceRange" value="<%= selectedPriceRange || 'all' %>">
+                        <button type="submit" name="type" value="digital" class="filter-btn <%= selectedType === 'digital' ? 'active' : '' %>">
+                            💾 Digital
+                        </button>
+                    </form>
+                </div>
+                    <% if (!Array.isArray(products) || products.length === 0) { %>
+                        <div class="no-products">
+                            <div class="no-products-icon">🛍️</div>
+                            <h2>No Products Available Yet</h2>
+                            <p>Be the first vendor to list products on Kevin's Corner!</p>
+                            <% if (user) { %>
+                                <a href="/vendor/apply" class="btn btn-primary">Become a Vendor</a>
+                            <% } else { %>
+                                <a href="/auth/register" class="btn btn-primary">Get Started</a>
+                            <% } %>
+                        </div>
+                    <% } else { %>
+                        <div class="products-grid">
+                            <% products.forEach(product => { %>
+                                <div class="product-card" onclick="location.href='/products/<%= product.id %>'">
+                                    <div class="product-image">
+                                        <% if (product.images && product.images.length > 0) { %>
+                                            <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+                                        <% } else { %>
+                                            <div class="no-image">No Image</div>
+                                        <% } %>
+                                        <span class="product-type-badge badge-<%= product.product_type || 'unknown' %>">
+                                            <%= product.product_type === 'physical' ? '📦 Physical' : product.product_type === 'digital' ? '💻 Digital' : 'Unknown' %>
+                                        </span>
+                                    </div>
+
+                                    <div class="product-content">
+                                        <div class="product-title"><%= product.name || 'Unnamed Product' %></div>
+                                        <div class="product-price">
+                            <%= product.currency || '' %> <%= product.price || 'N/A' %>
+                            <% if (typeof xmrPrice !== 'undefined' && xmrPrice && product.price) { %>
+                                <div class="xmr-price">≈ <%= ((parseFloat(product.price) / xmrPrice) * 1.07).toFixed(7) %> XMR</div>
+                            <% } %>
+                        </div>
+                                        <div class="product-description"><%= product.description || 'No description available' %></div>
+                                        <div class="product-vendor">by 
+                                            <% if (product.vendor_country_flag) { %>
+                                                <span class="vendor-flag"><%= product.vendor_country_flag %></span>
+                                            <% } %>
+                                            <%= product.vendor_name || product.vendor_displayname || 'Unknown Vendor' %>
+                                            <% if (product.vendor_is_trusted === 1 || product.user_is_trusted_vendor === 1) { %>
+                                                <span class="trusted-badge" title="Trusted Vendor">⭐</span>
+                                            <% } %>
+                                        </div>
+                                        <% if (product.vendor_rating && product.rating_count > 0) { %>
+                                            <div class="vendor-rating">
+                                                <div class="rating-stars">
+                                                    <% for (let i = 1; i <= 5; i++) { %>
+                                                        <span class="star <%= i <= Math.round(product.vendor_rating) ? 'filled' : '' %>">★</span>
+                                                    <% } %>
+                                                </div>
+                                                <span class="rating-count">(<%= product.rating_count %> review<%= product.rating_count === 1 ? '' : 's' %>)</span>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="no-rating">No reviews yet</div>
+                                        <% } %>
+                                        <% if (product.product_type === 'physical' && product.shipping_from) { %>
+                                            <div class="item-shipping">
+                                                📦 Ships from: <%= product.shipping_from %>
+                                            </div>
+                                        <% } %>
+                                        <% if (product.product_type === 'physical' && product.shipping_to) { %>
+                                            <div class="item-shipping">
+                                                🚚 Ships to: <%= product.shipping_to %>
+                                            </div>
+                                        <% } %>
+                                        <% if (product.vendor_rating) { %>
+                                <div class="vendor-rating">
+                                    <span class="rating-stars">
+                                        <% for (let i = 1; i <= 5; i++) { %>
+                                            <span class="star <%= i <= Math.round(product.vendor_rating) ? 'filled' : '' %>">★</span>
+                                        <% } %>
+                                    </span>
+                                    <span class="rating-text">(<%= product.rating_count %> reviews)</span>
+                                </div>
+                            <% } %>
+
+                            <% if (product.latestFeedback && product.latestFeedback.length > 0) { %>
+                                <div class="vendor-feedback-preview">
+                                    <h4>Recent Feedback:</h4>
+                                    <% product.latestFeedback.forEach(function(feedback) { %>
+                                        <div class="feedback-item">
+                                            <div class="feedback-rating">
+                                                <% for (let i = 1; i <= 5; i++) { %>
+                                                    <span class="star <%= i <= feedback.rating ? 'filled' : '' %>">★</span>
+                                                <% } %>
+                                                <span class="feedback-buyer">by <%= 
+                                                    feedback.buyer_name ? 
+                                                    (feedback.buyer_name.length <= 2 ? feedback.buyer_name : 
+                                                     feedback.buyer_name.charAt(0) + '*'.repeat(Math.max(0, feedback.buyer_name.length - 2)) + feedback.buyer_name.charAt(feedback.buyer_name.length - 1)) 
+                                                    : 'Anonymous' 
+                                                %></span>
+                                            </div>
+                                            <% if (feedback.comment) { %>
+                                                <p class="feedback-text"><%= feedback.comment.length > 100 ? feedback.comment.substring(0, 100) + '...' : feedback.comment %></p>
+                                            <% } %>
+                                            <small class="feedback-date"><%= new Date(feedback.created_at).toLocaleDateString() %></small>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } %>
+                                        <div class="product-actions">
+                                            <a href="/products/<%= product.id %>" class="btn-view">View Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+
+                        <% if (products.length >= 20) { %>
+                            <div style="text-align: center; margin-top: 40px;">
+                                <a href="/products" class="btn btn-secondary">View All Products</a>
+                            </div>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function filterProducts(type) {
+                const productCards = document.querySelectorAll('.product-card');
+                const categoryItems = document.querySelectorAll('.category-item');
+
+                categoryItems.forEach(item => item.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+
+                productCards.forEach(card => {
+                    const badge = card.querySelector('.product-type-badge');
+                    if (type === 'all') {
+                        card.style.display = 'block';
+                    } else if (type === 'digital' && badge && badge.textContent.includes('Digital')) {
+                        card.style.display = 'block';
+                    } else if (type === 'physical' && badge && badge.textContent.includes('Physical')) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const allProductsItem = document.querySelector('.category-item');
+                if (allProductsItem) {
+                    allProductsItem.classList.add('active');
+                }
+            });
+        </script>
     </main>
 
     <%- include('../partials/footer') %>

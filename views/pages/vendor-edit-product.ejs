@@ -1,0 +1,553 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .digital-content-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+
+        .content-type-selector {
+            margin-bottom: 20px;
+        }
+
+        .content-type-option {
+            display: none;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .content-type-option.active {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .form-section h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        .image-upload-input {
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .image-preview {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: rgba(220, 53, 69, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .help-text {
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            margin: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+    <%- include('../partials/vendor-nav') %>
+
+    <main>
+        <div class="form-container">
+            <div class="page-header">
+                <h2>Edit Product</h2>
+                <div class="action-buttons">
+                    <a href="/vendor/products" class="btn btn-secondary">← Back to Products</a>
+                    <button type="button" onclick="deleteProduct()" class="btn btn-danger">Delete Product</button>
+                </div>
+            </div>
+
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+
+            <form action="/vendor/products/<%= product.id %>/edit" method="POST" class="edit-product-form">
+                <!-- Basic Product Information -->
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+
+                    <div class="form-group">
+                        <label for="name">Product Name *</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter product name" value="<%= product.name %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" name="description" rows="4" required placeholder="Describe your product"><%= product.description %></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price">Price *</label>
+                            <input type="number" id="price" name="price" step="0.01" min="0" required placeholder="0.00" value="<%= product.price %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="currency">Currency</label>
+                            <select id="currency" name="currency">
+                                <option value="USD" <%= product.currency === 'USD' ? 'selected' : '' %>>USD</option>
+                                <option value="EUR" <%= product.currency === 'EUR' ? 'selected' : '' %>>EUR</option>
+                                <option value="GBP" <%= product.currency === 'GBP' ? 'selected' : '' %>>GBP</option>
+                                <option value="CAD" <%= product.currency === 'CAD' ? 'selected' : '' %>>CAD</option>
+                                <option value="AUD" <%= product.currency === 'AUD' ? 'selected' : '' %>>AUD</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="software" <%= product.category === 'software' ? 'selected' : '' %>>Software</option>
+                            <option value="games" <%= product.category === 'games' ? 'selected' : '' %>>Games</option>
+                            <option value="accounts" <%= product.category === 'accounts' ? 'selected' : '' %>>Accounts</option>
+                            <option value="media" <%= product.category === 'media' ? 'selected' : '' %>>Media</option>
+                            <option value="education" <%= product.category === 'education' ? 'selected' : '' %>>Education</option>
+                            <option value="other" <%= product.category === 'other' ? 'selected' : '' %>>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <% if (product.product_type === 'digital' && digitalDetails) { %>
+                <!-- Digital Content Configuration -->
+                <div class="form-section">
+                    <h3>Digital Content Details</h3>
+
+                    <div class="form-group content-type-selector">
+                        <label for="contentType">Content Type *</label>
+                        <select id="contentType" name="contentType" required onchange="toggleContentType()">
+                            <option value="">Select Content Type</option>
+                            <option value="download_link" <%= digitalDetails.content_type === 'download_link' ? 'selected' : '' %>>Download Link with Password</option>
+                            <option value="account_info" <%= digitalDetails.content_type === 'account_info' ? 'selected' : '' %>>Account Information</option>
+                            <option value="text_content" <%= digitalDetails.content_type === 'text_content' ? 'selected' : '' %>>Text-based Content</option>
+                        </select>
+                    </div>
+
+                    <!-- Download Link Option -->
+                    <div id="download_link_section" class="content-type-option <%= digitalDetails.content_type === 'download_link' ? 'active' : '' %>">
+                        <div class="form-group">
+                            <label for="downloadUrl">Download URL *</label>
+                            <input type="url" id="downloadUrl" name="downloadUrl" placeholder="https://example.com/file.rar" value="<%= digitalDetails.download_url || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="downloadPassword">Password *</label>
+                            <input type="text" id="downloadPassword" name="downloadPassword" placeholder="Enter password for the file" value="<%= digitalDetails.download_password || '' %>">
+                        </div>
+                    </div>
+
+                    <!-- Account Information Option -->
+                    <div id="account_info_section" class="content-type-option <%= digitalDetails.content_type === 'account_info' ? 'active' : '' %>">
+                        <div class="form-group">
+                            <label for="accountUsername">Username/Login *</label>
+                            <input type="text" id="accountUsername" name="accountUsername" placeholder="Account username" value="<%= digitalDetails.account_username || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="accountPassword">Password *</label>
+                            <input type="text" id="accountPassword" name="accountPassword" placeholder="Account password" value="<%= digitalDetails.account_password || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="accountEmail">Email (if applicable)</label>
+                            <input type="email" id="accountEmail" name="accountEmail" placeholder="Associated email address" value="<%= digitalDetails.account_email || '' %>">
+                        </div>
+                    </div>
+
+                    <!-- Text Content Option -->
+                    <div id="text_content_section" class="content-type-option <%= digitalDetails.content_type === 'text_content' ? 'active' : '' %>">
+                        <div class="form-group">
+                            <label for="textContent">Content *</label>
+                            <textarea id="textContent" name="textContent" rows="6" placeholder="Enter the digital content (codes, keys, instructions, etc.)"><%= digitalDetails.additional_info || '' %></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Common fields for all digital content -->
+                    <div class="form-group">
+                        <label for="instructions">Delivery Instructions</label>
+                        <textarea id="instructions" name="instructions" rows="3" placeholder="Instructions for the buyer on how to use the digital content"><%= digitalDetails.instructions || '' %></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalInfo">Additional Information</label>
+                        <textarea id="additionalInfo" name="additionalInfo" rows="2" placeholder="Any additional details or notes"><%= digitalDetails.additional_info || '' %></textarea>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (product.product_type === 'physical') { %>
+                <!-- Physical Product Details -->
+                <div class="form-section">
+                    <h3>Physical Product Details</h3>
+
+                    <div class="form-group">
+                        <label for="stockQuantity">Stock Quantity *</label>
+                        <input type="number" id="stockQuantity" name="stockQuantity" min="0" required placeholder="Available quantity" value="<%= product.stock_quantity %>">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shippingWeight">Weight (kg)</label>
+                            <input type="number" id="shippingWeight" name="shippingWeight" step="0.01" min="0" placeholder="0.00" value="<%= product.shipping_weight || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="shippingDimensions">Dimensions (L x W x H)</label>
+                            <input type="text" id="shippingDimensions" name="shippingDimensions" placeholder="e.g., 10x5x2 cm" value="<%= product.shipping_dimensions || '' %>">
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <!-- Product Status -->
+                <div class="form-section">
+                    <h3>Product Status</h3>
+
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="active" <%= product.status === 'active' ? 'selected' : '' %>>Active (Available for purchase)</option>
+                            <option value="draft" <%= product.status === 'draft' ? 'selected' : '' %>>Draft (Not visible to customers)</option>
+                            <option value="inactive" <%= product.status === 'inactive' ? 'selected' : '' %>>Inactive (Temporarily unavailable)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Product Images Section -->
+                <div class="form-section">
+                    <h3>Product Images</h3>
+                    <div class="form-group">
+                        <label>Current Images:</label>
+                        <div class="image-preview-container" id="currentImageContainer">
+                            <% if (product.image_urls) { 
+                                let images = [];
+                                try {
+                                    images = JSON.parse(product.image_urls);
+                                } catch (e) {
+                                    images = [];
+                                }
+                                images.forEach((img, index) => { %>
+                                    <div class="image-preview">
+                                        <img src="<%= img %>" alt="Product Image <%= index + 1 %>">
+                                    </div>
+                                <% });
+                            } %>
+                        </div>
+                        
+                        <label for="imageUpload">Add New Images (Max 5 images, 5MB each):</label>
+                        <input type="file" id="imageUpload" accept="image/*" multiple class="image-upload-input">
+                        <div class="image-preview-container" id="newImagePreviewContainer"></div>
+                        <p class="help-text">New images will be added to existing ones. Images will be automatically compressed and resized. EXIF data will be removed for privacy.</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary">Update Product</button>
+                    <button type="button" onclick="cloneProduct()" class="btn btn-secondary">Clone Product</button>
+                    <a href="/vendor/products" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        function toggleContentType() {
+            const contentType = document.getElementById('contentType').value;
+            const sections = document.querySelectorAll('.content-type-option');
+
+            // Hide all sections
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show the selected section
+            if (contentType) {
+                const targetSection = document.getElementById(contentType + '_section');
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+            }
+        }
+
+        function deleteProduct() {
+            if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+                fetch(`/vendor/products/<%= product.id %>/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/vendor/products?success=Product deleted successfully';
+                    } else {
+                        alert('Failed to delete product. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to delete product. Please try again.');
+                });
+            }
+        }
+
+        function cloneProduct() {
+            if (confirm('Are you sure you want to clone this product? This will create a duplicate listing.')) {
+                fetch(`/vendor/products/<%= product.id %>/clone`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/vendor/products?success=Product cloned successfully';
+                    } else {
+                        alert('Failed to clone product. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to clone product. Please try again.');
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUpload = document.getElementById('imageUpload');
+            const previewContainer = document.getElementById('newImagePreviewContainer');
+            const form = document.querySelector('form');
+            let selectedImages = [];
+
+            imageUpload.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+
+                if (files.length > 5) {
+                    alert('Maximum 5 images allowed');
+                    return;
+                }
+
+                selectedImages = [];
+                previewContainer.innerHTML = '';
+
+                files.forEach((file, index) => {
+                    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                        alert(`Image ${index + 1} is too large. Maximum 5MB per image.`);
+                        return;
+                    }
+
+                    readFileAsBase64(file)
+                        .then(base64 => {
+                            selectedImages.push(base64);
+
+                            const previewDiv = document.createElement('div');
+                            previewDiv.className = 'image-preview';
+                            previewDiv.innerHTML = `
+                                <img src="${base64}" alt="Preview ${index + 1}">
+                                <button type="button" onclick="removeNewImage(${index})" class="remove-image-btn">×</button>
+                            `;
+                            previewContainer.appendChild(previewDiv);
+                        })
+                        .catch(error => {
+                            console.error('Error processing image:', error);
+                            alert('Error processing image. Please try again.');
+                        });
+                });
+            });
+
+            function readFileAsBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        // Create an image to check dimensions
+                        const img = new Image();
+                        img.onload = () => {
+                            // If image is very large, resize it on client side
+                            if (img.width > 1600 || img.height > 1600 || file.size > 2000000) {
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+
+                                // Calculate new dimensions
+                                let { width, height } = img;
+                                const maxDimension = 1400;
+
+                                if (width > height) {
+                                    if (width > maxDimension) {
+                                        height = (height * maxDimension) / width;
+                                        width = maxDimension;
+                                    }
+                                } else {
+                                    if (height > maxDimension) {
+                                        width = (width * maxDimension) / height;
+                                        height = maxDimension;
+                                    }
+                                }
+
+                                canvas.width = width;
+                                canvas.height = height;
+
+                                // Draw and compress
+                                ctx.drawImage(img, 0, 0, width, height);
+                                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                                resolve(resizedBase64);
+                            } else {
+                                resolve(reader.result);
+                            }
+                        };
+                        img.src = reader.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            window.removeNewImage = function(index) {
+                selectedImages.splice(index, 1);
+                updateNewPreviews();
+            };
+
+            function updateNewPreviews() {
+                previewContainer.innerHTML = '';
+                selectedImages.forEach((imageSrc, index) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'image-preview';
+                    previewDiv.innerHTML = `
+                        <img src="${imageSrc}" alt="Preview ${index + 1}">
+                        <button type="button" onclick="removeNewImage(${index})" class="remove-image-btn">×</button>
+                    `;
+                    previewContainer.appendChild(previewDiv);
+                });
+            }
+
+            form.addEventListener('submit', function(e) {
+                // Add hidden inputs for new images
+                selectedImages.forEach((imageSrc, index) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'newProductImages[]';
+                    input.value = imageSrc;
+                    form.appendChild(input);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

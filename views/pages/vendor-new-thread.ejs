@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Thread - Vendor Forums - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .thread-form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .form-header {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-header h2 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .form-header p {
+            margin: 0;
+            color: #666;
+        }
+
+        .thread-form {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            min-height: 200px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .vendor-guidelines {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .vendor-guidelines h4 {
+            margin: 0 0 10px 0;
+            color: #155724;
+        }
+
+        .vendor-guidelines ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #155724;
+        }
+
+        .vendor-guidelines li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <main>
+        <%- include('../partials/vendor-nav') %>
+
+        <div class="thread-form-container">
+            <div class="form-header">
+                <h2>📝 Create New Discussion Thread</h2>
+                <p>Start a new discussion in the vendor forums</p>
+            </div>
+
+            <div class="vendor-guidelines">
+                <h4>💡 Forum Guidelines</h4>
+                <ul>
+                    <li>Keep discussions professional and respectful</li>
+                    <li>Share helpful tips and experiences with fellow vendors</li>
+                    <li>Ask questions about platform features, best practices, or business strategies</li>
+                    <li>No spam, advertising, or off-topic content</li>
+                    <li>Respect confidential business information</li>
+                </ul>
+            </div>
+
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+
+            <form action="/vendor/forums/new-thread" method="POST" class="thread-form">
+                <div class="form-group">
+                    <label for="title">Thread Title *</label>
+                    <input type="text" id="title" name="title" required 
+                           placeholder="Enter a descriptive title for your discussion..."
+                           maxlength="200">
+                </div>
+
+                <div class="form-group">
+                    <label for="content">Message Content *</label>
+                    <textarea id="content" name="content" required 
+                              placeholder="Share your thoughts, ask questions, or start a discussion...
+
+Examples:
+• Tips for optimizing product listings
+• Questions about shipping best practices  
+• Sharing successful marketing strategies
+• Discussing platform features or issues
+
+Be specific and provide context to help other vendors understand and contribute to the discussion."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/vendor/forums" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">🚀 Create Thread</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .orders-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            min-height: 80vh;
+        }
+
+        .order-card {
+            background: #2d2d2d;
+            border: 2px solid #444;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .order-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .order-body {
+            padding: 24px;
+            background: #2d2d2d;
+        }
+
+        .order-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            padding: 14px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+        }
+
+        .info-label {
+            font-weight: 700;
+            color: #e0e0e0;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            color: #b0b0b0;
+            margin-top: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .digital-content {
+            background: #1a2e1a;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .digital-content h4 {
+            color: #4caf50;
+            margin-top: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .content-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .content-item {
+            background: #2d2d2d;
+            border: 2px solid #28a745;
+            padding: 16px;
+            border-radius: 8px;
+            color: #e0e0e0;
+        }
+
+        .content-item strong {
+            color: #4caf50;
+            font-size: 1.1rem;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 80px 20px;
+            color: #b0b0b0;
+            background: #2d2d2d;
+            border-radius: 12px;
+            border: 2px solid #444;
+        }
+
+        .no-orders h3 {
+            color: #e0e0e0;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .no-orders p {
+            color: #b0b0b0;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
+
+        .order-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .pending-actions {
+            background: #332a00;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .pending-actions p {
+            color: #ffc107;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .pending-actions textarea {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #e0e0e0;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .accepted-actions {
+            background: #0d2818;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .accepted-actions p {
+            color: #4caf50;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .declined-info {
+            background: #2d0a0a;
+            border: 2px solid #dc3545;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .declined-info p {
+            color: #f56565;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .completed-info {
+            background: #0a1a2d;
+            border: 2px solid #007bff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .completed-info p {
+            color: #66b3ff;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .auto-declined-info {
+            background: #2d0a0a;
+            border: 2px solid #dc3545;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .auto-declined-info p {
+            color: #f56565;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .complete-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .complete-btn:hover {
+            background: #218838;
+        }
+
+        .ship-btn {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .ship-btn:hover {
+            background: #138496;
+        }
+
+        .deadline-warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+            border: 1px solid #ffeaa7;
+        }
+
+        .deadline-expired {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .shipped-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+            border: 1px solid #bee5eb;
+        }
+
+        .buyer-deadline {
+            background: #e2e3e5;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+            border: 1px solid #ced4da;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+    <%- include('../partials/vendor-nav') %>
+
+    <main style="background: #1a1a1a; color: #e0e0e0;">
+        <div class="orders-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: #2d2d2d; border-radius: 12px; border: 2px solid #444;">
+                <h2 style="color: #e0e0e0; font-size: 2rem; font-weight: 700; margin: 0;">My Orders</h2>
+                <div style="display: flex; gap: 12px;">
+                    <form method="POST" action="/vendor/orders/mark-read" style="display: inline;">
+                        <button type="submit" style="background: linear-gradient(135deg, #6c757d, #5a6268); color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.3s ease;">
+                            ✓ Mark Notifications Read
+                        </button>
+                    </form>
+                    <button onclick="refreshOrders()" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.3s ease;" id="refreshBtn">
+                        🔄 Refresh Orders
+                    </button>
+                </div>
+            </div>
+
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+
+            <% if (orders && orders.length > 0) { %>
+                <% orders.forEach(order => { %>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <strong>Order #<%= order.id %></strong> - <%= order.product_name %>
+                            </div>
+                            <div>
+                                <span class="status-badge <%= order.status %>"><%= order.status.toUpperCase() %></span>
+                            </div>
+                        </div>
+
+                        <div class="order-body">
+                            <div class="order-info">
+                                <div class="info-item">
+                                    <div class="info-label">Buyer</div>
+                                    <div class="info-value"><%= order.buyer_displayname %> (@<%= order.buyer_username %>)</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Product Type</div>
+                                    <div class="info-value"><%= order.product_type.charAt(0).toUpperCase() + order.product_type.slice(1) %></div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Quantity</div>
+                                    <div class="info-value"><%= order.quantity %></div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Total Price</div>
+                                    <div class="info-value"><%= order.currency %> <%= order.total_price %></div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Order Date</div>
+                                    <div class="info-value"><%= new Date(order.created_at).toLocaleDateString() %></div>
+                                </div>
+
+                                <% if (order.completed_at) { %>
+                                <div class="info-item">
+                                    <div class="info-label">Completed Date</div>
+                                    <div class="info-value"><%= new Date(order.completed_at).toLocaleDateString() %></div>
+                                </div>
+                                <% } %>
+                            </div>
+
+                            <% if (order.product_type === 'digital' && order.content_type) { %>
+                                <div class="digital-content">
+                                    <h4>Digital Content Details</h4>
+
+                                    <% if (order.content_type === 'download_link') { %>
+                                        <div class="content-details">
+                                            <div class="content-item">
+                                                <strong>Download URL:</strong><br>
+                                                <span id="url-<%= order.id %>"><%= order.download_url %></span>
+                                                <button class="copy-btn" onclick="copyToClipboard('url-<%= order.id %>')">Copy</button>
+                                            </div>
+                                            <div class="content-item">
+                                                <strong>Password:</strong><br>
+                                                <span id="pass-<%= order.id %>"><%= order.download_password %></span>
+                                                <button class="copy-btn" onclick="copyToClipboard('pass-<%= order.id %>')">Copy</button>
+                                            </div>
+                                        </div>
+                                    <% } else if (order.content_type === 'account_info') { %>
+                                        <div class="content-details">
+                                            <div class="content-item">
+                                                <strong>Username:</strong><br>
+                                                <span id="user-<%= order.id %>"><%= order.account_username %></span>
+                                                <button class="copy-btn" onclick="copyToClipboard('user-<%= order.id %>')">Copy</button>
+                                            </div>
+                                            <div class="content-item">
+                                                <strong>Password:</strong><br>
+                                                <span id="accpass-<%= order.id %>"><%= order.account_password %></span>
+                                                <button class="copy-btn" onclick="copyToClipboard('accpass-<%= order.id %>')">Copy</button>
+                                            </div>
+                                            <% if (order.account_email) { %>
+                                            <div class="content-item">
+                                                <strong>Email:</strong><br>
+                                                <span id="email-<%= order.id %>"><%= order.account_email %></span>
+                                                <button class="copy-btn" onclick="copyToClipboard('email-<%= order.id %>')">Copy</button>
+                                            </div>
+                                            <% } %>
+                                        </div>
+                                    <% } else if (order.content_type === 'text_content') { %>
+                                        <div class="content-details">
+                                            <div class="content-item" style="grid-column: 1 / -1;">
+                                                <strong>Content:</strong><br>
+                                                <span id="text-<%= order.id %>"><%= order.additional_info %></span>
+                                                <button class="copy-btn" onclick="copyToClipboard('text-<%= order.id %>')">Copy</button>
+                                            </div>
+                                        </div>
+                                    <% } %>
+
+                                    <% if (order.instructions) { %>
+                                        <div class="content-item" style="margin-top: 10px;">
+                                            <strong>Instructions:</strong><br>
+                                            <span><%= order.instructions %></span>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% } %>
+
+                            <!-- Order Actions -->
+                            <div class="order-actions">
+                                <% if (order.status === 'pending') { %>
+                                    <% 
+                                        const now = new Date();
+                                        const autoDeclineDate = new Date(order.auto_decline_at);
+                                        const timeLeft = Math.max(0, Math.ceil((autoDeclineDate - now) / (1000 * 60 * 60 * 24)));
+                                    %>
+                                    <div class="pending-actions">
+                                        <p><strong>⏰ Action Required:</strong> You have <%= timeLeft %> day(s) to respond to this order.</p>
+                                        <form method="POST" action="/vendor/orders/<%= order.id %>/accept" style="display: inline;">
+                                            <textarea name="response_message" placeholder="Optional message to buyer..." rows="2" style="width: 300px; margin-right: 10px;"></textarea>
+                                            <button type="submit" class="btn btn-success">✅ Accept Order</button>
+                                        </form>
+                                        <form method="POST" action="/vendor/orders/<%= order.id %>/decline" style="display: inline; margin-left: 10px;">
+                                            <textarea name="response_message" placeholder="Reason for declining..." rows="2" style="width: 300px; margin-right: 10px;"></textarea>
+                                            <button type="submit" class="btn btn-danger">❌ Decline Order</button>
+                                        </form>
+                                    </div>
+                                <% } else if (order.status === 'accepted') { %>
+                                    
+                                    <form method="POST" action="/vendor/orders/<%= order.id %>/ship" style="display: inline;">
+                                        <input type="text" name="tracking_info" placeholder="Optional tracking info..." style="background: #1a1a1a; border: 2px solid #444; color: #e0e0e0; border-radius: 6px; padding: 8px; margin-right: 10px; width: 200px;">
+                                        <button type="submit" class="action-btn ship-btn">📦 Mark as Shipped</button>
+                                    </form>
+                                    <% 
+                                    // Check if shipping deadline is approaching
+                                    if (order.vendor_response_at) {
+                                        const acceptedDate = new Date(order.vendor_response_at);
+                                        const shippingDeadline = new Date(acceptedDate);
+                                        shippingDeadline.setDate(shippingDeadline.getDate() + 7);
+                                        const daysLeft = Math.ceil((shippingDeadline - new Date()) / (1000 * 60 * 60 * 24));
+                                        if (daysLeft <= 7 && daysLeft > 0) {
+                                    %>
+                                        <div class="deadline-warning">
+                                            ⚠️ Ship within <%= daysLeft %> day<%= daysLeft !== 1 ? 's' : '' %>
+                                        </div>
+                                    <% } else if (daysLeft <= 0) { %>
+                                        <div class="deadline-expired">
+                                            🚨 Shipping deadline passed!
+                                        </div>
+                                    <% } } %>
+                                <% } else if (order.status === 'shipped') { %>
+                                    <div class="shipped-info">
+                                        📦 Shipped: <%= order.delivery_details || 'No tracking info' %>
+                                    </div>
+                                    <% 
+                                    // Check if buyer response deadline
+                                    if (order.buyer_dispute_deadline) {
+                                        const deadline = new Date(order.buyer_dispute_deadline);
+                                        const daysLeft = Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24));
+                                        if (daysLeft > 0) {
+                                    %>
+                                        <div class="buyer-deadline">
+                                            ⏳ Buyer has <%= daysLeft %> day<%= daysLeft !== 1 ? 's' : '' %> to respond
+                                        </div>
+                                    <% } else { %>
+                                        <button onclick="completeOrder(<%= order.id %>)" class="action-btn complete-btn">
+                                            ✅ Auto-Complete Order
+                                        </button>
+                                    <% } } %>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="no-orders">
+                    <h3>No Orders Yet</h3>
+                    <p>You haven't received any orders yet. Keep promoting your products!</p>
+                    <a href="/vendor/products" class="btn btn-primary">Manage Products</a>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+
+            navigator.clipboard.writeText(text).then(function() {
+                // Show feedback
+                const button = element.nextElementSibling;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'linear-gradient(135deg, #007bff, #0056b3)';
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        function refreshOrders() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const originalText = refreshBtn.textContent;
+
+            // Show loading state
+            refreshBtn.textContent = '🔄 Refreshing...';
+            refreshBtn.disabled = true;
+            refreshBtn.style.opacity = '0.7';
+
+            // Reload the page to get fresh order data
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        }
+
+        
+
+        
+    </script>
+</body>
+</html>

@@ -1,3 +1,21 @@
 <footer>
-    <p>&copy; <%= new Date().getFullYear() %> My Node.js App</p>
+    <div class="footer-content">
+        <div class="footer-left">
+            <p>&copy; <%= new Date().getFullYear() %> Kevin's Corner Marketplace</p>
+            <% if (typeof stats !== 'undefined' && stats) { %>
+                <div class="footer-stats">
+                    <span class="footer-stat">👥 Users: <%= stats.userCount %></span>
+                    <span class="footer-stat">🏪 Vendors: <%= stats.vendorCount %></span>
+                    <span class="footer-stat">📅 Days Online: <%= stats.daysSinceCreation %></span>
+                </div>
+            <% } %>
+        </div>
+        <div class="footer-links">
+            <a href="/rules" class="footer-link" title="Community Rules & Guidelines">📋 Rules</a>
+            <a href="/forums" class="footer-link" title="Community Forums & Discussions">💬 Forums</a>
+            <a href="/support/contact" class="footer-link" title="Contact Support Team">🎧 Support</a>
+            <a href="/vendor/apply" class="footer-link vendor-btn" title="Start Selling on Our Platform">🏪 Become a Vendor</a>
+            <a href="/apply/dispute-moderator" class="footer-link moderator-btn" title="Apply">⚖️ Apply</a>
+        </div>
+    </div>
 </footer>

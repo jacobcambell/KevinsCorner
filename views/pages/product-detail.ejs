@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.name %> - Kevin's Corner</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <main>
+        <div class="product-detail-container">
+            <% if (success) { %>
+                <div class="success"><%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+
+            <div class="product-detail">
+                <div class="product-images">
+                    <% if (product.images && product.images.length > 0) { %>
+                        <div class="main-image">
+                            <img src="<%= product.images[0] %>" alt="<%= product.name %>" id="mainImage">
+                        </div>
+                        <% if (product.images.length > 1) { %>
+                            <div class="image-thumbnails">
+                                <% product.images.forEach((image, index) => { %>
+                                    <img src="<%= image %>" alt="<%= product.name %>" 
+                                         onclick="changeMainImage('<%= image %>')" 
+                                         class="thumbnail <%= index === 0 ? 'active' : '' %>">
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <div class="no-image">
+                            <span>No Image Available</span>
+                        </div>
+                    <% } %>
+                </div>
+
+                <div class="product-info">
+                    <h1 class="product-title"><%= product.name %></h1>
+
+                    <div class="product-meta">
+                        <span class="product-type"><%= product.product_type.charAt(0).toUpperCase() + product.product_type.slice(1) %></span>
+                        <span class="product-category"><%= product.category %></span>
+                    </div>
+
+                    <div class="product-price">
+                        <span class="currency"><%= product.currency || 'USD' %></span>
+                        <span class="amount">$<%= parseFloat(product.price).toFixed(2) %></span>
+                        <% if (typeof xmrPrice !== 'undefined' && xmrPrice) { %>
+                            <div class="xmr-price">≈ <%= ((parseFloat(product.price) / xmrPrice) * 1.07).toFixed(7) %> XMR</div>
+                        <% } %>
+                    </div>
+
+                    <div class="product-description">
+                        <h3>Description</h3>
+                        <p><%= product.description %></p>
+                    </div>
+
+                    <% if (digitalDetails) { %>
+                        <div class="digital-details">
+                            <h3>Digital Product Details</h3>
+                            <div class="detail-item">
+                                <strong>Content Type:</strong> <%= digitalDetails.content_type %>
+                            </div>
+                            <% if (digitalDetails.instructions) { %>
+                                <div class="detail-item">
+                                    <strong>Instructions:</strong> <%= digitalDetails.instructions %>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% } %>
+
+                    <div class="vendor-info">
+                        <h3>Sold by</h3>
+                        <div class="vendor-card">
+                            <% if (product.vendor_avatar) { %>
+                                <img src="<%= product.vendor_avatar %>" alt="<%= product.vendor_name %>" class="vendor-avatar">
+                            <% } else { %>
+                                <div class="vendor-avatar-placeholder">
+                                    <%= product.vendor_name.charAt(0).toUpperCase() %>
+                                </div>
+                            <% } %>
+                            <div class="vendor-details">
+                                <div class="vendor-name">
+                                    <%= product.vendor_name %>
+                                    <% if (product.vendor_is_trusted === 1 || product.user_is_trusted_vendor === 1) { %>
+                                        <span class="trusted-vendor-badge">
+                                            <% if (product.vendor_country_flag) { %>
+                                                <img src="<%= product.vendor_country_flag %>" alt="Country Flag" class="country-flag">
+                                            <% } %>
+                                            ✓ Trusted Vendor
+                                        </span>
+                                    <% } %>
+                                </div>
+                                <% if (product.shipping_from) { %>
+                                    <div class="vendor-location">Ships from: <%= product.shipping_from %></div>
+                                <% } %>
+                                <% if (vendorReviews && vendorReviews.length > 0) { %>
+                                    <div class="vendor-rating">
+                                        <div class="rating-stars">
+                                            <% for (let i = 1; i <= 5; i++) { %>
+                                                <span class="star <%= i <= Math.round(averageRating) ? 'filled' : '' %>">★</span>
+                                            <% } %>
+                                        </div>
+                                        <span class="rating-text">
+                                            <%= averageRating.toFixed(1) %> (<%= vendorReviews.length %> review<%= vendorReviews.length !== 1 ? 's' : '' %>)
+                                        </span>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if (vendorReviews && vendorReviews.length > 0) { %>
+                        <div class="vendor-reviews-section">
+                            <h3>Vendor Reviews</h3>
+
+                            <div class="vendor-overall-rating">
+                                <div class="rating-display">
+                                    <div class="rating-stars">
+                                        <% for (let i = 1; i <= 5; i++) { %>
+                                            <span class="star <%= i <= Math.round(averageRating) ? 'filled' : '' %>">★</span>
+                                        <% } %>
+                                    </div>
+                                    <div class="rating-text">
+                                        Average: <%= averageRating.toFixed(1) %>/5 from <%= vendorReviews.length %> review<%= vendorReviews.length !== 1 ? 's' : '' %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="recent-reviews">
+                                <h5>Recent Reviews</h5>
+                                <% vendorReviews.forEach(review => { %>
+                                    <div class="review-item">
+                                        <div class="review-header">
+                                            <div class="review-rating">
+                                                <% for (let i = 1; i <= 5; i++) { %>
+                                                    <span class="star <%= i <= review.rating ? 'filled' : '' %>">★</span>
+                                                <% } %>
+                                            </div>
+                                            <div class="review-meta">
+                                                <span class="reviewer-name"><%
+                                                    const displayName = review.buyer_name || review.buyer_username;
+                                                    if (displayName && displayName.length > 2) {
+                                                        const censored = displayName.charAt(0) + '*'.repeat(Math.max(0, displayName.length - 2)) + displayName.charAt(displayName.length - 1);
+                                                    %>
+                                                    <%= censored %>
+                                                    <%
+                                                    } else {
+                                                    %>
+                                                    <%= displayName || 'Anonymous' %>
+                                                    <%
+                                                    }
+                                                %></span>
+                                                <span class="review-date"><%= new Date(review.created_at).toLocaleDateString() %></span>
+                                            </div>
+                                        </div>
+                                        <% if (review.feedback_text) { %>
+                                            <div class="review-text">"<%= review.feedback_text %>"</div>
+                                        <% } %>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="vendor-reviews-section">
+                            <h3>Vendor Reviews</h3>
+                            <div class="no-reviews">
+                                No reviews yet for this vendor.
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <div class="product-actions">
+                        <% if (user) { %>
+                            <a href="/products/<%= product.id %>/order" class="btn btn-primary btn-large">
+                                Order Now
+                            </a>
+                        <% } else { %>
+                            <a href="/auth/login?redirect=/products/<%= product.id %>" class="btn btn-primary btn-large">
+                                Login to Order
+                            </a>
+                        <% } %>
+                        <a href="/" class="btn btn-secondary">← Back to Products</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        function changeMainImage(imageSrc) {
+            document.getElementById('mainImage').src = imageSrc;
+
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+                if (thumb.src === imageSrc) {
+                    thumb.classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
