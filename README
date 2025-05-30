@@ -1,0 +1,7 @@
+README
+
+npm install
+create username admin, create username displayname
+
+dropdown has access to admin panel which can change user permissions
+each role has different ways to access the site different panels
