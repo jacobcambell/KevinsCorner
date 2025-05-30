@@ -1,7 +1,8 @@
 README
 
 npm install
-create username admin, create username displayname
+create username admin, create displayname admin
+this account gives admin to the admin panel
 
 dropdown has access to admin panel which can change user permissions
 each role has different ways to access the site different panels
