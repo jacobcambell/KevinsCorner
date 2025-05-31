@@ -1,26 +1,26 @@
 {
-  "name": "kevinscorner",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "axios": "^1.9.0",
-    "bcrypt": "^6.0.0",
-    "ejs": "^3.1.10",
-    "express": "^5.1.0",
-    "express-session": "^1.18.1",
-    "multer": "^2.0.0",
-    "openpgp": "^6.1.1",
-    "sharp": "^0.34.2",
-    "sqlite3": "^5.1.7"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.10"
-  }
+    "name": "kevinscorner",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "axios": "1.9.0",
+        "bcrypt": "6.0.0",
+        "ejs": "3.1.10",
+        "express": "5.1.0",
+        "express-session": "1.18.1",
+        "multer": "2.0.0",
+        "openpgp": "6.1.1",
+        "sharp": "0.34.2",
+        "sqlite3": "5.1.7"
+    },
+    "devDependencies": {
+        "nodemon": "3.1.10"
+    }
 }
